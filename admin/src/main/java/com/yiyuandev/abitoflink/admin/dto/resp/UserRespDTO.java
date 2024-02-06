@@ -12,10 +12,4 @@ public class UserRespDTO {
     private String realName;
     private String phone;
     private String email;
-
-    /**
-     * 0: not deleted
-     * 1: deleted
-     */
-    private Integer delFlag;
 }
