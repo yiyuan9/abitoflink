@@ -5,7 +5,9 @@ import com.yiyuandev.abitoflink.admin.common.convention.errorcode.IErrorCode;
 public enum UserErrorEnum implements IErrorCode {
 
     USER_NULL("B000200", "User does not exist"),
-    USER_EXIST("B000201", "User already exist"),
+    USER_NAME_EXIST("B000201", "Username already exist"),
+    USER_EXIST("B000202", "User already exist"),
+    USER_SAVE_ERROR("B000203", "User registration error"),
     ;
     private final String code;
     private final String message;
