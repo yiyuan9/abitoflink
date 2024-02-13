@@ -3,6 +3,7 @@ package com.yiyuandev.abitoflink.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yiyuandev.abitoflink.admin.common.convention.enums.UserErrorEnum;
@@ -10,6 +11,7 @@ import com.yiyuandev.abitoflink.admin.common.convention.exception.ClientExceptio
 import com.yiyuandev.abitoflink.admin.dao.entity.UserDO;
 import com.yiyuandev.abitoflink.admin.dao.mapper.UserMapper;
 import com.yiyuandev.abitoflink.admin.dto.req.UserRegisterReqDTO;
+import com.yiyuandev.abitoflink.admin.dto.req.UserUpdateReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.UserRespDTO;
 import com.yiyuandev.abitoflink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -68,5 +70,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public void update(UserUpdateReqDTO requestParam) {
+        // TODO: check if user is the one who logged in
+        LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers.lambdaUpdate(UserDO.class)
+                .eq(UserDO::getUsername, requestParam.getUsername());
+        baseMapper.update(BeanUtil.toBean(requestParam, UserDO.class), updateWrapper);
     }
 }

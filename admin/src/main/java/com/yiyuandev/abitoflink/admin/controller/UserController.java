@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Results;
 import com.yiyuandev.abitoflink.admin.dto.req.UserRegisterReqDTO;
+import com.yiyuandev.abitoflink.admin.dto.req.UserUpdateReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.UserActualRespDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.UserRespDTO;
 import com.yiyuandev.abitoflink.admin.service.UserService;
@@ -50,6 +51,12 @@ public class UserController {
     @PostMapping("/api/abitoflink/v1/user/")
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam){
         userService.register(requestParam);
+        return Results.success();
+    }
+
+    @PutMapping("/api/abitoflink/v1/user/")
+    public Result<Void> update(@RequestBody UserUpdateReqDTO requestParam){
+        userService.update(requestParam);
         return Results.success();
     }
 }
