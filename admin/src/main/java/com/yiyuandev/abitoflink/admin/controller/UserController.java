@@ -73,4 +73,11 @@ public class UserController {
         return Results.success(userService.isLogin(token, username));
     }
 
+    @DeleteMapping("/api/abitoflink/v1/user/logout/")
+    public Result<Void> logout(@RequestParam("token") String token,
+                                   @RequestParam("username") String username){
+        userService.logout(token, username);
+        return Results.success();
+    }
+
 }

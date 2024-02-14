@@ -81,14 +81,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Override
     public void update(UserUpdateReqDTO requestParam) {
         String username = requestParam.getUsername();
-        LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers.lambdaUpdate(UserDO.class)
-                .eq(UserDO::getUsername, username);
-        Boolean isLogin = stringRedisTemplate.hasKey("login_" + username);
-        if (isLogin != null && isLogin){
+        String token = requestParam.getToken();
+        if (token != null && isLogin(token, username)){
+            LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers.lambdaUpdate(UserDO.class)
+                    .eq(UserDO::getUsername, username);
             baseMapper.update(BeanUtil.toBean(requestParam, UserDO.class), updateWrapper);
-        } else {
-            throw new ClientException(USER_UPDATE_ERROR);
+            return;
         }
+        throw new ClientException(USER_UPDATE_ERROR);
+
     }
 
     @Override
@@ -126,5 +127,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Override
     public Boolean isLogin(String token, String username) {
         return stringRedisTemplate.opsForHash().hasKey("login_" + username, token);
+    }
+
+    @Override
+    public void logout(String token, String username) {
+        if (isLogin(token, username)){
+            stringRedisTemplate.delete("login_" + username);
+            return;
+        }
+        throw new ClientException(USER_LOGOUT_ERROR);
     }
 }

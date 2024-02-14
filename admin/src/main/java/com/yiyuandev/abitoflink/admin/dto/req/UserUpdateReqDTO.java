@@ -12,4 +12,5 @@ public class UserUpdateReqDTO {
     private String realName;
     private String phone;
     private String email;
+    private String token;
 }
