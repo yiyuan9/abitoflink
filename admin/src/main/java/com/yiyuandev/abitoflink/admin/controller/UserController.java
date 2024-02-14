@@ -3,9 +3,11 @@ package com.yiyuandev.abitoflink.admin.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Results;
+import com.yiyuandev.abitoflink.admin.dto.req.UserLoginReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.UserRegisterReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.UserUpdateReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.UserActualRespDTO;
+import com.yiyuandev.abitoflink.admin.dto.resp.UserLoginRespDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.UserRespDTO;
 import com.yiyuandev.abitoflink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -59,4 +61,16 @@ public class UserController {
         userService.update(requestParam);
         return Results.success();
     }
+
+    @PostMapping("/api/abitoflink/v1/user/login/")
+    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParam){
+        return Results.success(userService.login(requestParam));
+    }
+
+    @GetMapping("/api/abitoflink/v1/user/is-login/")
+    public Result<Boolean> isLogin(@RequestParam("token") String token,
+                                   @RequestParam("username") String username){
+        return Results.success(userService.isLogin(token, username));
+    }
+
 }
