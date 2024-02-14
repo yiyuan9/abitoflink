@@ -30,6 +30,33 @@ rules:
         # Number of shards
         props:
           sharding-count: 16
+  - !ENCRYPT
+    # The tables that need encryption
+    tables:
+      # User table
+      t_user:
+        # The fields in the user table that need encryption
+        columns:
+          # Phone number field, logical field, may not actually exist in the database
+          phone:
+            # The encrypted text field that stores the phone number in the database
+            cipherColumn: phone
+            # Encryption algorithm for ID number
+            encryptorName: common_encryptor
+          password:
+            cipherColumn: password
+            encryptorName: common_encryptor
+        # Whether to query with the encrypted text field
+        queryWithCipherColumn: true
+      # Encryption algorithms
+    encryptors:
+      # Custom encryption algorithm name
+      common_encryptor:
+        # Encryption algorithm type
+        type: AES
+        props:
+          # AES encryption key
+          aes-key-value: i1209kodClr098s7das1
 # Display logical SQL & real SQL
 props:
   sql-show: true
