@@ -80,10 +80,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Override
     public void update(UserUpdateReqDTO requestParam) {
-        // TODO: check if user is the one who logged in
+        String username = requestParam.getUsername();
         LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers.lambdaUpdate(UserDO.class)
-                .eq(UserDO::getUsername, requestParam.getUsername());
-        baseMapper.update(BeanUtil.toBean(requestParam, UserDO.class), updateWrapper);
+                .eq(UserDO::getUsername, username);
+        Boolean isLogin = stringRedisTemplate.hasKey("login_" + username);
+        if (isLogin != null && isLogin){
+            baseMapper.update(BeanUtil.toBean(requestParam, UserDO.class), updateWrapper);
+        } else {
+            throw new ClientException(USER_UPDATE_ERROR);
+        }
     }
 
     @Override
