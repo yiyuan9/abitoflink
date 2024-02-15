@@ -1,18 +1,20 @@
 package com.yiyuandev.abitoflink.admin.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-
-import java.util.Date;
+import com.yiyuandev.abitoflink.admin.common.database.BaseDO;
+import lombok.*;
 
 /**
  * link group
  */
+
 @Data
 @TableName("t_group")
-public class GroupDO {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true)
+public class GroupDO extends BaseDO {
     private Long id;
     /**
      * Group id
@@ -20,14 +22,4 @@ public class GroupDO {
     private String gid;
     private String name;
     private String username;
-    @TableField(fill = FieldFill.INSERT)
-    private Date creationTime;
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
-    /**
-     * 0: not deleted
-     * 1: deleted
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private Integer delFlag;
 }
