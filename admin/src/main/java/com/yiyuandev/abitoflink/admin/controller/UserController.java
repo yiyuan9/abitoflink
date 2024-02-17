@@ -56,23 +56,41 @@ public class UserController {
         return Results.success();
     }
 
+    /**
+     * Update user info
+     */
     @PutMapping("/api/abitoflink/v1/user/")
     public Result<Void> update(@RequestBody UserUpdateReqDTO requestParam){
         userService.update(requestParam);
         return Results.success();
     }
 
+    /**
+     * User login
+     */
     @PostMapping("/api/abitoflink/v1/user/login/")
     public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParam){
         return Results.success(userService.login(requestParam));
     }
 
+    /**
+     * Check if user is login
+     * @param token login token
+     * @param username username
+     * @return true: user is login; false: user is not login
+     */
     @GetMapping("/api/abitoflink/v1/user/is-login/")
     public Result<Boolean> isLogin(@RequestParam("token") String token,
                                    @RequestParam("username") String username){
         return Results.success(userService.isLogin(token, username));
     }
 
+    /**
+     *
+     * User logout
+     * @param token login token
+     * @param username username
+     */
     @DeleteMapping("/api/abitoflink/v1/user/logout/")
     public Result<Void> logout(@RequestParam("token") String token,
                                    @RequestParam("username") String username){
