@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yiyuandev.abitoflink.admin.common.biz.user.UserContext;
 import com.yiyuandev.abitoflink.admin.dao.entity.GroupDO;
 import com.yiyuandev.abitoflink.admin.dao.mapper.GroupMapper;
 import com.yiyuandev.abitoflink.admin.dto.resp.LinkGroupSaveRespDTO;
@@ -25,6 +26,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         } while (hasGid(gid));
         GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
+                .username(UserContext.getUsername())
                 .name(groupName)
                 .sortOrder(0)
                 .build();
@@ -35,9 +37,8 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
     public List<LinkGroupSaveRespDTO> listGroup() {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getDelFlag, 0)
-                .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime)
-                //TODO: get username
-                .isNull(GroupDO::getUsername);
+                .eq(GroupDO::getUsername, UserContext.getUsername())
+                .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
         return BeanUtil.copyToList(groupDOList, LinkGroupSaveRespDTO.class);
     }
@@ -45,8 +46,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
     private Boolean hasGid(String gid){
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getGid, gid)
-                //TODO: get username from gateway
-                .eq(GroupDO::getUsername, null);
+                .eq(GroupDO::getUsername, UserContext.getUsername());
         GroupDO result = baseMapper.selectOne(queryWrapper);
         return result != null;
     }
