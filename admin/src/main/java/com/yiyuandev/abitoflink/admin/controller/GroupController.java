@@ -21,7 +21,7 @@ public class GroupController {
     /**
      * Add new group
      */
-    @PostMapping("/api/abitoflink/v1/group/")
+    @PostMapping("/api/abitoflink/admin/v1/group/")
     public Result<Void> saveGroup(@RequestBody LinkGroupSaveReqDTO requestParam){
         groupService.saveGroup(requestParam.getName());
         return Results.success();
@@ -30,7 +30,7 @@ public class GroupController {
     /**
      * Get list of groups created by current user
      */
-    @GetMapping("/api/abitoflink/v1/group/")
+    @GetMapping("/api/abitoflink/admin/v1/group/")
     public Result<List<LinkGroupSaveRespDTO>> listGroup(){
         return Results.success(groupService.listGroup());
     }
@@ -39,7 +39,7 @@ public class GroupController {
      * Update group name
      * @param requestParam LinkGroupUpdateReqDTO
      */
-    @PutMapping("/api/abitoflink/v1/group/")
+    @PutMapping("/api/abitoflink/admin/v1/group/")
     public Result<Void> updateGroup(@RequestBody LinkGroupUpdateReqDTO requestParam){
         groupService.updateGroup(requestParam);
         return Results.success();
@@ -49,13 +49,13 @@ public class GroupController {
      * Delete group
      * @param gid the group's gid to be deleted
      */
-    @DeleteMapping("/api/abitoflink/v1/group/")
+    @DeleteMapping("/api/abitoflink/admin/v1/group/")
     public Result<Void> deleteGroup(@RequestParam("gid") String gid){
         groupService.deleteGroup(gid);
         return Results.success();
     }
 
-    @PostMapping("/api/abitoflink/v1/group/sort/")
+    @PostMapping("/api/abitoflink/admin/v1/group/sort/")
     public Result<Void> sortGroup(@RequestBody List<LinkGroupSortReqDTO> requestParam){
         groupService.sortGroup(requestParam);
         return Results.success();
