@@ -3,6 +3,7 @@ package com.yiyuandev.abitoflink.admin.controller;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Results;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupSaveReqDTO;
+import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupSortReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupUpdateReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.LinkGroupSaveRespDTO;
 import com.yiyuandev.abitoflink.admin.service.GroupService;
@@ -54,5 +55,10 @@ public class GroupController {
         return Results.success();
     }
 
+    @PostMapping("/api/abitoflink/v1/group/sort/")
+    public Result<Void> sortGroup(@RequestBody List<LinkGroupSortReqDTO> requestParam){
+        groupService.sortGroup(requestParam);
+        return Results.success();
+    }
 
 }
