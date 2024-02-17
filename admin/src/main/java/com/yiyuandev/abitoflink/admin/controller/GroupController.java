@@ -34,9 +34,25 @@ public class GroupController {
         return Results.success(groupService.listGroup());
     }
 
+    /**
+     * Update group name
+     * @param requestParam LinkGroupUpdateReqDTO
+     */
     @PutMapping("/api/abitoflink/v1/group/")
     public Result<Void> updateGroup(@RequestBody LinkGroupUpdateReqDTO requestParam){
         groupService.updateGroup(requestParam);
         return Results.success();
     }
+
+    /**
+     * Delete group
+     * @param gid the group's gid to be deleted
+     */
+    @DeleteMapping("/api/abitoflink/v1/group/")
+    public Result<Void> deleteGroup(@RequestParam("gid") String gid){
+        groupService.deleteGroup(gid);
+        return Results.success();
+    }
+
+
 }
