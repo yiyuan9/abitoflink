@@ -1,13 +1,18 @@
 package com.yiyuandev.abitoflink.project.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import com.yiyuandev.abitoflink.project.common.database.BaseDO;
+import lombok.*;
 
 import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("t_link")
-public class ShortLinkDO {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ShortLinkDO extends BaseDO {
     /**
      * id
      */
@@ -67,19 +72,4 @@ public class ShortLinkDO {
      * description
      */
     private String description;
-
-    /**
-     * creation_time
-     */
-    private Date creationTime;
-
-    /**
-     * update_time
-     */
-    private Date updateTime;
-
-    /**
-     * 0: not deleted; 1: deleted
-     */
-    private int delFlag;
 }
