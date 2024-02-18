@@ -23,8 +23,8 @@ public class HashUtil {
     }
 
     public static String hashToBase62(String str) {
-        long i = MurmurHash.hash64(str);
-        long num = i < 0 ? Long.MAX_VALUE - i : i;
+        long i = MurmurHash.hash32(str);
+        long num = i < 0 ? Integer.MAX_VALUE - i : i;
         return convertDecToBase62(num);
     }
 }
