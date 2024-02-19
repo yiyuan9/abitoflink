@@ -1,18 +1,11 @@
-package com.yiyuandev.abitoflink.project.dao.entity;
+package com.yiyuandev.abitoflink.project.dto.resp;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.yiyuandev.abitoflink.project.common.database.BaseDO;
-import lombok.*;
+import lombok.Data;
 
 import java.util.Date;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("t_link")
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class ShortLinkDO extends BaseDO {
+public class ShortLinkPageRespDTO {
     /**
      * id
      */
@@ -47,16 +40,6 @@ public class ShortLinkDO extends BaseDO {
      * number of clicks
      */
     private Integer clickNum;
-
-    /**
-     * enable: 0， not enable: 1
-     */
-    private int enableStatus;
-
-    /**
-     * by api: 0， by console: 1
-     */
-    private int createdType;
 
     /**
      * permanent: 0， custom: 1

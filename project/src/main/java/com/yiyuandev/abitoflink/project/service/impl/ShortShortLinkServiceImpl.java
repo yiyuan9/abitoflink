@@ -1,14 +1,18 @@
 package com.yiyuandev.abitoflink.project.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.StrBuilder;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yiyuandev.abitoflink.project.common.convention.exception.ServiceException;
 import com.yiyuandev.abitoflink.project.dao.entity.ShortLinkDO;
 import com.yiyuandev.abitoflink.project.dao.mapper.ShortLinkMapper;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkCreateReqDTO;
+import com.yiyuandev.abitoflink.project.dto.req.ShortLinkPageReqDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkPageRespDTO;
 import com.yiyuandev.abitoflink.project.service.ShortLinkService;
 import com.yiyuandev.abitoflink.project.util.HashUtil;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +67,18 @@ public class ShortShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, Shor
                 .originUrl(requestParam.getOriginUrl())
                 .fullShortUrl(shortLinkDO.getFullShortUrl())
                 .build();
+    }
+
+    @Override
+    public IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam) {
+        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, requestParam.getGid())
+                .eq(ShortLinkDO::getDelFlag, 0)
+                .eq(ShortLinkDO::getEnableStatus, 0)
+                .orderByDesc(ShortLinkDO::getCreationTime);
+        IPage<ShortLinkDO> resultPage = baseMapper.selectPage(requestParam, queryWrapper);
+        return resultPage.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
+
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam){
