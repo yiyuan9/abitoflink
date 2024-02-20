@@ -1,10 +1,9 @@
-package com.yiyuandev.abitoflink.admin.common.convention.enums;
+package com.yiyuandev.abitoflink.project.common.convention.enums;
 
-import com.yiyuandev.abitoflink.admin.common.convention.errorcode.IErrorCode;
+import com.yiyuandev.abitoflink.project.common.convention.errorcode.IErrorCode;
 
 public enum UserErrorEnum implements IErrorCode {
 
-    USER_TOKEN_FAIL("A000200", "User Token Validation Failed"),
     USER_NULL("B000200", "User does not exist"),
     USER_NAME_EXIST("B000201", "Username already exist"),
     USER_EXIST("B000202", "User already exist"),
