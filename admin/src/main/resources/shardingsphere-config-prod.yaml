@@ -1,0 +1,62 @@
+# Data source collection
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://127.0.0.1:3306/abitoflink?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B11
+    username: root
+    password: your-production-env-db-password
+
+rules:
+  - !SHARDING
+    tables:
+      t_user:
+        # Real data nodes, such as database sources and databases that actually exist in the database
+        actualDataNodes: ds_0.t_user_${0..15}
+        # Table strategy
+        tableStrategy:
+          # For standard sharding scenarios with a single sharding key
+          standard:
+            # Sharding key
+            shardingColumn: username
+            # Sharding algorithm, corresponding to rules[0].shardingAlgorithms
+            shardingAlgorithmName: user_table_hash_mod
+    # Sharding algorithm
+    shardingAlgorithms:
+      # Data table sharding algorithm
+      user_table_hash_mod:
+        # Shard by hash of sharding key
+        type: HASH_MOD
+        # Number of shards
+        props:
+          sharding-count: 16
+  - !ENCRYPT
+    # The tables that need encryption
+    tables:
+      # User table
+      t_user:
+        # The fields in the user table that need encryption
+        columns:
+          # Phone number field, logical field, may not actually exist in the database
+          phone:
+            # The encrypted text field that stores the phone number in the database
+            cipherColumn: phone
+            # Encryption algorithm for ID number
+            encryptorName: common_encryptor
+          password:
+            cipherColumn: password
+            encryptorName: common_encryptor
+        # Whether to query with the encrypted text field
+        queryWithCipherColumn: true
+      # Encryption algorithms
+    encryptors:
+      # Custom encryption algorithm name
+      common_encryptor:
+        # Encryption algorithm type
+        type: AES
+        props:
+          # AES encryption key
+          aes-key-value: i1209kodClr098s7das1
+# Display logical SQL & real SQL
+props:
+  sql-show: true
