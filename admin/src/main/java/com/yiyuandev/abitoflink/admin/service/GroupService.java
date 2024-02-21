@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.yiyuandev.abitoflink.admin.dao.entity.GroupDO;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupSortReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupUpdateReqDTO;
-import com.yiyuandev.abitoflink.admin.dto.resp.LinkGroupSaveRespDTO;
+import com.yiyuandev.abitoflink.admin.dto.resp.LinkGroupRespDTO;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public interface GroupService extends IService<GroupDO> {
     /**
      * List groups created by current user
      */
-    List<LinkGroupSaveRespDTO> listGroup();
+    List<LinkGroupRespDTO> listGroup();
 
     /**
      * Update group info

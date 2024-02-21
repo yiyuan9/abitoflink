@@ -10,7 +10,7 @@ import com.yiyuandev.abitoflink.admin.dao.entity.GroupDO;
 import com.yiyuandev.abitoflink.admin.dao.mapper.GroupMapper;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupSortReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupUpdateReqDTO;
-import com.yiyuandev.abitoflink.admin.dto.resp.LinkGroupSaveRespDTO;
+import com.yiyuandev.abitoflink.admin.dto.resp.LinkGroupRespDTO;
 import com.yiyuandev.abitoflink.admin.service.GroupService;
 import com.yiyuandev.abitoflink.admin.util.RandomGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +37,13 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
     }
 
     @Override
-    public List<LinkGroupSaveRespDTO> listGroup() {
+    public List<LinkGroupRespDTO> listGroup() {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getDelFlag, 0)
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
-        return BeanUtil.copyToList(groupDOList, LinkGroupSaveRespDTO.class);
+        return BeanUtil.copyToList(groupDOList, LinkGroupRespDTO.class);
     }
 
     @Override
