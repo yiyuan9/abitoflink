@@ -21,10 +21,28 @@ rules:
             shardingColumn: username
             # Sharding algorithm, corresponding to rules[0].shardingAlgorithms
             shardingAlgorithmName: user_table_hash_mod
+      t_group:
+        # Real data nodes, such as database sources and databases that actually exist in the database
+        actualDataNodes: ds_0.t_group_${0..15}
+        # Table strategy
+        tableStrategy:
+          # For standard sharding scenarios with a single sharding key
+          standard:
+            # Sharding key
+            shardingColumn: username
+            # Sharding algorithm, corresponding to rules[0].shardingAlgorithms
+            shardingAlgorithmName: group_table_hash_mod
     # Sharding algorithm
     shardingAlgorithms:
       # Data table sharding algorithm
       user_table_hash_mod:
+        # Shard by hash of sharding key
+        type: HASH_MOD
+        # Number of shards
+        props:
+          sharding-count: 16
+      # Data table sharding algorithm
+      group_table_hash_mod:
         # Shard by hash of sharding key
         type: HASH_MOD
         # Number of shards

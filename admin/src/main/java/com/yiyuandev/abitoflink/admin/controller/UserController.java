@@ -26,7 +26,7 @@ public class UserController {
     /**
      * Get user (desensitization) by username
      */
-    @GetMapping("/api/abitoflink/v1/user/{username}")
+    @GetMapping("/api/abitoflink/admin/v1/user/{username}")
     public Result<UserRespDTO> getUserByUsername(@PathVariable("username") String username){
         return Results.success(userService.getUserByUsername(username));
     }
@@ -34,7 +34,7 @@ public class UserController {
     /**
      * Get user (no desensitization) by username
      */
-    @GetMapping("/api/abitoflink/v1/actual/user/{username}")
+    @GetMapping("/api/abitoflink/admin/v1/actual/user/{username}")
     public Result<UserActualRespDTO> getActualUserByUsername(@PathVariable("username") String username){
         return Results.success(BeanUtil.toBean(userService.getUserByUsername(username), UserActualRespDTO.class));
     }
@@ -42,7 +42,7 @@ public class UserController {
     /**
      * Check if username is available for registration
      */
-    @GetMapping("/api/abitoflink/v1/user/is-username-available")
+    @GetMapping("/api/abitoflink/admin/v1/user/is-username-available")
     public  Result<Boolean> isUsernameAvailable(@RequestParam String username){
         return Results.success(userService.isUsernameAvailable(username));
     }
@@ -50,7 +50,7 @@ public class UserController {
     /**
      * User registration
      */
-    @PostMapping("/api/abitoflink/v1/user/")
+    @PostMapping("/api/abitoflink/admin/v1/user")
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam){
         userService.register(requestParam);
         return Results.success();
@@ -59,7 +59,7 @@ public class UserController {
     /**
      * Update user info
      */
-    @PutMapping("/api/abitoflink/admin/v1/user/")
+    @PutMapping("/api/abitoflink/admin/v1/user")
     public Result<Void> update(@RequestBody UserUpdateReqDTO requestParam){
         userService.update(requestParam);
         return Results.success();
@@ -68,7 +68,7 @@ public class UserController {
     /**
      * User login
      */
-    @PostMapping("/api/abitoflink/admin/v1/user/login/")
+    @PostMapping("/api/abitoflink/admin/v1/user/login")
     public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParam){
         return Results.success(userService.login(requestParam));
     }
@@ -79,7 +79,7 @@ public class UserController {
      * @param username username
      * @return true: user is login; false: user is not login
      */
-    @GetMapping("/api/abitoflink/admin/v1/user/is-login/")
+    @GetMapping("/api/abitoflink/admin/v1/user/is-login")
     public Result<Boolean> isLogin(@RequestParam("token") String token,
                                    @RequestParam("username") String username){
         return Results.success(userService.isLogin(token, username));
@@ -91,7 +91,7 @@ public class UserController {
      * @param token login token
      * @param username username
      */
-    @DeleteMapping("/api/abitoflink/admin/v1/user/logout/")
+    @DeleteMapping("/api/abitoflink/admin/v1/user/logout")
     public Result<Void> logout(@RequestParam("token") String token,
                                    @RequestParam("username") String username){
         userService.logout(token, username);

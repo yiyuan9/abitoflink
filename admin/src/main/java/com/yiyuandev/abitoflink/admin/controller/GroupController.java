@@ -5,7 +5,7 @@ import com.yiyuandev.abitoflink.admin.common.convention.result.Results;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupSaveReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupSortReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupUpdateReqDTO;
-import com.yiyuandev.abitoflink.admin.dto.resp.LinkGroupSaveRespDTO;
+import com.yiyuandev.abitoflink.admin.dto.resp.LinkGroupRespDTO;
 import com.yiyuandev.abitoflink.admin.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,7 @@ public class GroupController {
      * Get list of groups created by current user
      */
     @GetMapping("/api/abitoflink/admin/v1/group/")
-    public Result<List<LinkGroupSaveRespDTO>> listGroup(){
+    public Result<List<LinkGroupRespDTO>> listGroup(){
         return Results.success(groupService.listGroup());
     }
 
