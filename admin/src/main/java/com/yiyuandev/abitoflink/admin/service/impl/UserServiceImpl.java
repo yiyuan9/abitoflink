@@ -15,6 +15,7 @@ import com.yiyuandev.abitoflink.admin.dto.req.UserRegisterReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.UserUpdateReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.UserLoginRespDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.UserRespDTO;
+import com.yiyuandev.abitoflink.admin.service.GroupService;
 import com.yiyuandev.abitoflink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBloomFilter;
@@ -38,6 +39,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     private final RBloomFilter<String> userRegisterCachePenetrationBloomFilter;
     private final RedissonClient redissonClient;
     private final StringRedisTemplate stringRedisTemplate;
+    private final GroupService groupService;
 
     @Override
     public UserRespDTO getUserByUsername(String username) {
@@ -75,6 +77,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     throw new ClientException(USER_EXIST);
                 }
                 userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
+                groupService.saveGroup(requestParam.getUsername(),"default");
                 return;
             }
             throw new ClientException(USER_NAME_EXIST);

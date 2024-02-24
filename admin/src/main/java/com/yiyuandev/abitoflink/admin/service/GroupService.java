@@ -16,6 +16,11 @@ public interface GroupService extends IService<GroupDO> {
     void saveGroup(String groupName);
 
     /**
+     * Add list group with default group name
+     */
+    void saveGroup(String username,String groupName);
+
+    /**
      * List groups created by current user
      */
     List<LinkGroupRespDTO> listGroup();
