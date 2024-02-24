@@ -11,4 +11,9 @@ public class LinkGroupRespDTO {
      * sort by order
      */
     private Integer sortOrder;
+
+    /**
+     * number of links in the group
+     */
+    private Integer shortLinkCount;
 }

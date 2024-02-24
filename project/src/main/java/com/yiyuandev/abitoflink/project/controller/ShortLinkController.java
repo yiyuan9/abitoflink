@@ -6,13 +6,13 @@ import com.yiyuandev.abitoflink.project.common.convention.result.Results;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkPageReqDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkPageRespDTO;
 import com.yiyuandev.abitoflink.project.service.ShortLinkService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +36,17 @@ public class ShortLinkController {
      * @return IPage<ShortLinkPageRespDTO>
      */
     @GetMapping("/api/abitoflink/v1/page")
-    private Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam){
+    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam){
         return Results.success(shortLinkService.pageShortLink(requestParam));
+    }
+
+    /**
+     * get list of gid and its number of short links
+     * @param requestParam {gid}
+     * @return List<ShortLinkGroupCountQueryRespDTO>
+     */
+    @GetMapping("/api/abitoflink/v1/count")
+    public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam){
+        return Results.success(shortLinkService.listGroupShortLinkCount(requestParam));
     }
 }
