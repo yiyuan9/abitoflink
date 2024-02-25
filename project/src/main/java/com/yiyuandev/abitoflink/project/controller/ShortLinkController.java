@@ -5,6 +5,7 @@ import com.yiyuandev.abitoflink.project.common.convention.result.Result;
 import com.yiyuandev.abitoflink.project.common.convention.result.Results;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkPageReqDTO;
+import com.yiyuandev.abitoflink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkPageRespDTO;
@@ -38,6 +39,16 @@ public class ShortLinkController {
     @GetMapping("/api/abitoflink/v1/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam){
         return Results.success(shortLinkService.pageShortLink(requestParam));
+    }
+
+    /**
+     * update short link
+     * @param requestParam ShortLinkUpdateReqDTO
+     */
+    @PostMapping("/api/abitoflink/v1/update")
+    public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam){
+        shortLinkService.updateShortLink(requestParam);
+        return Results.success();
     }
 
     /**
