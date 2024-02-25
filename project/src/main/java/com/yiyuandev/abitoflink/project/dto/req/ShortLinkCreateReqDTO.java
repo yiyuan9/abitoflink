@@ -1,5 +1,6 @@
 package com.yiyuandev.abitoflink.project.dto.req;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -34,6 +35,7 @@ public class ShortLinkCreateReqDTO {
     /**
      * valid_date
      */
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss", timezone = "GMT+11")
     private Date validDate;
 
     /**
