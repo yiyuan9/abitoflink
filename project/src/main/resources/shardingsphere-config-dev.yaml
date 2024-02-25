@@ -21,10 +21,27 @@ rules:
             shardingColumn: gid
             # Sharding algorithm, corresponding to rules[0].shardingAlgorithms
             shardingAlgorithmName: link_table_hash_mod
+      t_link_goto:
+        # Real data nodes, such as database sources and databases that actually exist in the database
+        actualDataNodes: ds_0.t_link_goto_${0..15}
+        # Table strategy
+        tableStrategy:
+          # For standard sharding scenarios with a single sharding key
+          standard:
+            # Sharding key
+            shardingColumn: full_short_url
+            # Sharding algorithm, corresponding to rules[0].shardingAlgorithms
+            shardingAlgorithmName: link_goto_table_hash_mod
     # Sharding algorithm
     shardingAlgorithms:
       # Data table sharding algorithm
       link_table_hash_mod:
+        # Shard by hash of sharding key
+        type: HASH_MOD
+        # Number of shards
+        props:
+          sharding-count: 16
+      link_goto_table_hash_mod:
         # Shard by hash of sharding key
         type: HASH_MOD
         # Number of shards
