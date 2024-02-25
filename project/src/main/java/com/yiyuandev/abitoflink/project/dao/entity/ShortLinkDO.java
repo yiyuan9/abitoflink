@@ -51,17 +51,17 @@ public class ShortLinkDO extends BaseDO {
     /**
      * enable: 0， not enable: 1
      */
-    private int enableStatus;
+    private Integer enableStatus;
 
     /**
      * by api: 0， by console: 1
      */
-    private int createdType;
+    private Integer createdType;
 
     /**
      * permanent: 0， custom: 1
      */
-    private int validDateType;
+    private Integer validDateType;
 
     /**
      * valid_date

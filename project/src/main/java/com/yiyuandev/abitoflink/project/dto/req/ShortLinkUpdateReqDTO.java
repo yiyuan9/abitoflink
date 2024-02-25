@@ -6,26 +6,21 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class ShortLinkCreateReqDTO {
+public class ShortLinkUpdateReqDTO {
     /**
-     * domain
+     * full short link url, unchangeable
      */
-    private String domain;
+    private String fullShortUrl;
+
+    /**
+     * group id, unchangeable
+     */
+    private String gid;
 
     /**
      * original url
      */
     private String originUrl;
-
-    /**
-     * group id
-     */
-    private String gid;
-
-    /**
-     * by api: 0， by console: 1
-     */
-    private int createdType;
 
     /**
      * permanent: 0， custom: 1

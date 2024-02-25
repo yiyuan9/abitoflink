@@ -5,20 +5,31 @@ import com.yiyuandev.abitoflink.project.common.convention.result.Result;
 import com.yiyuandev.abitoflink.project.common.convention.result.Results;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkPageReqDTO;
+import com.yiyuandev.abitoflink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkPageRespDTO;
 import com.yiyuandev.abitoflink.project.service.ShortLinkService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class ShortLinkController {
 
     private final ShortLinkService shortLinkService;
+
+    /**
+     * restore full short url from short uri
+     */
+    @GetMapping("/{short-uri}")
+    public void restoreUrl(@PathVariable("short-uri") String shortUri, HttpServletRequest request, HttpServletResponse response){
+        shortLinkService.restoreUrl(shortUri, request, response);
+    }
 
     /**
      * create short link
@@ -36,7 +47,27 @@ public class ShortLinkController {
      * @return IPage<ShortLinkPageRespDTO>
      */
     @GetMapping("/api/abitoflink/v1/page")
-    private Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam){
+    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam){
         return Results.success(shortLinkService.pageShortLink(requestParam));
+    }
+
+    /**
+     * update short link
+     * @param requestParam ShortLinkUpdateReqDTO
+     */
+    @PostMapping("/api/abitoflink/v1/update")
+    public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam){
+        shortLinkService.updateShortLink(requestParam);
+        return Results.success();
+    }
+
+    /**
+     * get list of gid and its number of short links
+     * @param requestParam {gid}
+     * @return List<ShortLinkGroupCountQueryRespDTO>
+     */
+    @GetMapping("/api/abitoflink/v1/count")
+    public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam){
+        return Results.success(shortLinkService.listGroupShortLinkCount(requestParam));
     }
 }

@@ -5,12 +5,15 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
+import com.yiyuandev.abitoflink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,5 +43,25 @@ public interface ShortLinkRemoteService {
         String resultPage = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/page", requestMap);
 
         return JSON.parseObject(resultPage, new TypeReference<>(){});
+    }
+
+    /**
+     * number of short links in each group
+     * @param requestParam {gid}
+     * @return List<ShortLinkGroupCountQueryRespDTO>
+     */
+    default Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(List<String> requestParam){
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("requestParam", requestParam);
+        String resultPage = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/count", requestMap);
+        return JSON.parseObject(resultPage, new TypeReference<>(){});
+    }
+
+    /**
+     * update short link
+     * @param requestParam ShortLinkUpdateReqDTO
+     */
+    default void updateShortLink(ShortLinkUpdateReqDTO requestParam){
+        String resultBody = HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/update", JSON.toJSONString(requestParam));
     }
 }
