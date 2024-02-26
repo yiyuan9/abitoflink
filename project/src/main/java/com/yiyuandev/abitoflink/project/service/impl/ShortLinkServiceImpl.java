@@ -24,6 +24,7 @@ import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkGroupCountQueryRespDTO
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkPageRespDTO;
 import com.yiyuandev.abitoflink.project.service.ShortLinkService;
 import com.yiyuandev.abitoflink.project.util.HashUtil;
+import com.yiyuandev.abitoflink.project.util.LinkUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -95,6 +96,13 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 throw new ServiceException("Duplicate short links found");
             }
         }
+
+        stringRedisTemplate.opsForValue().set(
+                        fullShortUrl,
+                        requestParam.getOriginUrl(),
+                        LinkUtil.getLinkCacheValidTime(requestParam.getValidDate()), TimeUnit.MILLISECONDS
+        );
+
         shortUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
                 .gid(requestParam.getGid())
