@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
 import com.yiyuandev.abitoflink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
+import com.yiyuandev.abitoflink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
@@ -63,7 +64,7 @@ public interface ShortLinkRemoteService {
      * @param requestParam ShortLinkUpdateReqDTO
      */
     default void updateShortLink(ShortLinkUpdateReqDTO requestParam){
-        String resultBody = HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/update", JSON.toJSONString(requestParam));
+        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/update", JSON.toJSONString(requestParam));
     }
 
     /**
@@ -74,5 +75,13 @@ public interface ShortLinkRemoteService {
     default Result<String> getTitleByUrl(@RequestParam("url") String url){
         String result = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/title?url=" + url);
         return JSON.parseObject(result, new TypeReference<>(){});
+    }
+
+    /**
+     * move to recycle bin
+     * @param requestParam RecycleBinSaveReqDTO
+     */
+    default void saveRecycleBin(RecycleBinSaveReqDTO requestParam){
+        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/recycle-bin/save", JSON.toJSONString(requestParam));
     }
 }
