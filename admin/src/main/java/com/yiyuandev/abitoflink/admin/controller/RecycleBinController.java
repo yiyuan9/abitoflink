@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Results;
 import com.yiyuandev.abitoflink.admin.dto.req.RecycleBinRecoverReqDTO;
+import com.yiyuandev.abitoflink.admin.dto.req.RecycleBinRemoveReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.ShortLinkRemoteService;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
@@ -50,6 +51,15 @@ public class RecycleBinController {
     @PostMapping("/api/abitoflink/admin/v1/recycle-bin/recover")
     public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO requestParam){
         shortLinkRemoteService.recoverRecycleBin(requestParam);
+        return Results.success();
+    }
+
+    /**
+     * remove short link
+     */
+    @PostMapping("/api/abitoflink/admin/v1/recycle-bin/remove")
+    public Result<Void> removeRecycleBin(@RequestBody RecycleBinRemoveReqDTO requestParam){
+        shortLinkRemoteService.removeRecycleBin(requestParam);
         return Results.success();
     }
 }
