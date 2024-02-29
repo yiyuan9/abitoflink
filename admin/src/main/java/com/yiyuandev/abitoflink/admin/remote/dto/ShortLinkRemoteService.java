@@ -5,12 +5,13 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
+import com.yiyuandev.abitoflink.admin.dto.req.RecycleBinRecoverReqDTO;
+import com.yiyuandev.abitoflink.admin.dto.req.RecycleBinRemoveReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkCreateReqDTO;
-import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkPageReqDTO;
-import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
+import com.yiyuandev.abitoflink.admin.remote.dto.req.*;
 import com.yiyuandev.abitoflink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.resp.ShortLinkPageRespDTO;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +63,57 @@ public interface ShortLinkRemoteService {
      * @param requestParam ShortLinkUpdateReqDTO
      */
     default void updateShortLink(ShortLinkUpdateReqDTO requestParam){
-        String resultBody = HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/update", JSON.toJSONString(requestParam));
+        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/update", JSON.toJSONString(requestParam));
+    }
+
+    /**
+     * get title
+     * @param url url
+     * @return title
+     */
+    default Result<String> getTitleByUrl(@RequestParam("url") String url){
+        String result = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/title?url=" + url);
+        return JSON.parseObject(result, new TypeReference<>(){});
+    }
+
+    /**
+     * move to recycle bin
+     * @param requestParam RecycleBinSaveReqDTO
+     */
+    default void saveRecycleBin(RecycleBinSaveReqDTO requestParam){
+        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/recycle-bin/save", JSON.toJSONString(requestParam));
+    }
+
+    /**
+     * recycle bin item pagination
+     * @param requestParam ShortLinkPageReqDTO
+     * @return IPage<ShortLinkPageRespDTO>
+     */
+    default Result<IPage<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO requestParam){
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("gidList", requestParam.getGidList());
+        requestMap.put("current", requestParam.getCurrent());
+        requestMap.put("size", requestParam.getSize());
+        String resultPage = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/recycle-bin/page", requestMap);
+
+        return JSON.parseObject(resultPage, new TypeReference<>(){});
+    }
+
+    /**
+     * recover short link from recycle bin
+     * @param requestParam RecycleBinRecoverReqDTO
+     */
+    default void recoverRecycleBin(RecycleBinRecoverReqDTO requestParam){
+        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/recycle-bin/recover", JSON.toJSONString(requestParam));
+
+    }
+
+    /**
+     * remove short link
+     * @param requestParam RecycleBinRemoveReqDTO
+     */
+    default void removeRecycleBin(RecycleBinRemoveReqDTO requestParam){
+        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/recycle-bin/remove", JSON.toJSONString(requestParam));
+
     }
 }

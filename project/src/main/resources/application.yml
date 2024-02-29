@@ -19,3 +19,14 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
