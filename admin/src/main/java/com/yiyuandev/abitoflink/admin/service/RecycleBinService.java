@@ -6,5 +6,10 @@ import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkRecycleBinPageReqD
 import com.yiyuandev.abitoflink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 
 public interface RecycleBinService {
+    /**
+     * recycle bin short link pagination
+     * @param requestParam ShortLinkRecycleBinPageReqDTO
+     * @return IPage<ShortLinkPageRespDTO>
+     */
     Result<IPage<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO requestParam);
 }
