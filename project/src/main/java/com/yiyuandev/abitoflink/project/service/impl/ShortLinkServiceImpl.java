@@ -302,6 +302,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 setRespCookieTask.run();
             }
 
+            String uip = LinkUtil.getIp(request);
+            Long uipAdded = stringRedisTemplate.opsForSet().add("short-link:stats:uip" + fullShortUrl, uip);
+            boolean uipFlag = uipAdded != null && uipAdded > 0L;
+
             if (StrUtil.isBlank(gid)){
                 LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
                         .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
@@ -314,7 +318,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             LinkAccessStatsDO linkAccessStatsDO = LinkAccessStatsDO.builder()
                     .pv(1)
                     .uv(uvFlag.get() ? 1 : 0)
-                    .uip(1)
+                    .uip(uipFlag ? 1 : 0)
                     .hour(hour)
                     .weekday(weekValue)
                     .gid(gid)
