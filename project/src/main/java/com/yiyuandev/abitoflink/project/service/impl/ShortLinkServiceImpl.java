@@ -20,14 +20,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yiyuandev.abitoflink.project.common.convention.exception.ClientException;
 import com.yiyuandev.abitoflink.project.common.convention.exception.ServiceException;
 import com.yiyuandev.abitoflink.project.common.enums.ValidDateTypeEnum;
-import com.yiyuandev.abitoflink.project.dao.entity.LinkAccessStatsDO;
-import com.yiyuandev.abitoflink.project.dao.entity.LinkLocaleStatsDO;
-import com.yiyuandev.abitoflink.project.dao.entity.ShortLinkDO;
-import com.yiyuandev.abitoflink.project.dao.entity.ShortLinkGotoDO;
-import com.yiyuandev.abitoflink.project.dao.mapper.LinkAccessStatsMapper;
-import com.yiyuandev.abitoflink.project.dao.mapper.LinkLocaleStatsMapper;
-import com.yiyuandev.abitoflink.project.dao.mapper.ShortLinkGotoMapper;
-import com.yiyuandev.abitoflink.project.dao.mapper.ShortLinkMapper;
+import com.yiyuandev.abitoflink.project.dao.entity.*;
+import com.yiyuandev.abitoflink.project.dao.mapper.*;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkPageReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkUpdateReqDTO;
@@ -76,6 +70,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final RedissonClient redissonClient;
     private final LinkAccessStatsMapper linkAccessStatsMapper;
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+    private final LinkOsStatsMapper linkOsStatsMapper;
 
     @Value("${short-link.stats.locale.findIp-key}")
     private String findIpKey;
@@ -363,6 +358,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 linkLocaleStatsMapper.shortLinkLocaleStats(localeStatsDO);
             }
 
+            LinkOsStatsDO osStatsDO = LinkOsStatsDO.builder()
+                    .os(StatsUtil.getOs(request))
+                    .fullShortUrl(fullShortUrl)
+                    .cnt(1)
+                    .gid(gid)
+                    .date(new Date())
+                    .build();
+            linkOsStatsMapper.shortLinkOsStats(osStatsDO);
 
         } catch (Throwable ex){
             log.error("short link page view stats error", ex);

@@ -1,6 +1,7 @@
 package com.yiyuandev.abitoflink.project.util;
 
 import com.alibaba.fastjson2.JSONObject;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Optional;
 
@@ -53,5 +54,27 @@ public class StatsUtil {
                 .map(obj -> obj.getJSONObject("names"))
                 .map(str -> str.getString("en"))
                 .orElse("unknown");
+    }
+
+    /**
+     * get operating system
+     */
+    public static String getOs(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        if (userAgent.toLowerCase().contains("windows")) {
+            return "Windows";
+        } else if (userAgent.toLowerCase().contains("mac")) {
+            return "Mac OS";
+        } else if (userAgent.toLowerCase().contains("linux")) {
+            return "Linux";
+        } else if (userAgent.toLowerCase().contains("unix")) {
+            return "Unix";
+        } else if (userAgent.toLowerCase().contains("android")) {
+            return "Android";
+        } else if (userAgent.toLowerCase().contains("iphone")) {
+            return "iOS";
+        } else {
+            return "Unknown";
+        }
     }
 }
