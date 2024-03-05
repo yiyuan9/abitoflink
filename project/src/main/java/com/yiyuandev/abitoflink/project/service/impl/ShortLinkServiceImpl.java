@@ -71,6 +71,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkAccessStatsMapper linkAccessStatsMapper;
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
     private final LinkOsStatsMapper linkOsStatsMapper;
+    private final LinkBrowserStatsMapper linkBrowserStatsMapper;
 
     @Value("${short-link.stats.locale.findIp-key}")
     private String findIpKey;
@@ -366,6 +367,16 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .date(new Date())
                     .build();
             linkOsStatsMapper.shortLinkOsStats(osStatsDO);
+
+            LinkBrowserStatsDO browserStatsDO = LinkBrowserStatsDO.builder()
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .cnt(1)
+                    .date(new Date())
+                    .browser(StatsUtil.getBrowser(request))
+                    .build();
+            linkBrowserStatsMapper.shortLinkBrowserStats(browserStatsDO);
+
 
         } catch (Throwable ex){
             log.error("short link page view stats error", ex);
