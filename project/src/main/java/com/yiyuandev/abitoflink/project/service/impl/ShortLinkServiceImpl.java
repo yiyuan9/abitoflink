@@ -384,7 +384,16 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .date(new Date())
                     .device(StatsUtil.getDevice(request))
                     .build();
-            linkDeviceStatsMapper.shortlinkDeviceStats(linkDeviceStatsDO);
+            linkDeviceStatsMapper.shortLinkDeviceStats(linkDeviceStatsDO);
+
+            LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .cnt(1)
+                    .date(new Date())
+                    .network(StatsUtil.getNetwork(request))
+                    .build();
+            linkNetworkStatsMapper.shortLinkNetworkStats(linkNetworkStatsDO);
 
             LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder()
                     .user(uv.get())

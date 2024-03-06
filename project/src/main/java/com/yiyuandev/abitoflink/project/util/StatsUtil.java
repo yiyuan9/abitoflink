@@ -110,4 +110,39 @@ public class StatsUtil {
         }
         return "PC";
     }
+
+    /**
+     * get ip
+     * @param request HttpServletRequest
+     * @return ip
+     */
+    public static String getIp(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+
+        return ipAddress;
+    }
+
+    /**
+     * get network type
+     */
+    public static String getNetwork(HttpServletRequest request) {
+        String ip = getIp(request);
+        return ip.startsWith("192.168.") || ip.startsWith("10.") ? "WIFI" : "Mobile Data";
+        }
 }

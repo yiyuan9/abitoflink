@@ -11,5 +11,5 @@ public interface LinkDeviceStatsMapper extends BaseMapper<LinkDeviceStatsDO> {
             "VALUES" +
             "(#{linkDeviceStats.fullShortUrl}, #{linkDeviceStats.gid}, #{linkDeviceStats.date}, #{linkDeviceStats.cnt}, #{linkDeviceStats.device}, NOW(), NOW(), 0 )" +
             "ON DUPLICATE KEY UPDATE cnt = cnt + #{linkDeviceStats.cnt};")
-    void shortlinkDeviceStats(@Param("linkDeviceStats") LinkDeviceStatsDO deviceStatsDO);
+    void shortLinkDeviceStats(@Param("linkDeviceStats") LinkDeviceStatsDO deviceStatsDO);
 }
