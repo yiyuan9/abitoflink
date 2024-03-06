@@ -55,6 +55,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.yiyuandev.abitoflink.project.common.constant.RedisKeyConstant.*;
 import static com.yiyuandev.abitoflink.project.common.constant.ShortLinkConstant.FINDIP_LOCALE_REMOTE_URL;
@@ -72,6 +73,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
     private final LinkOsStatsMapper linkOsStatsMapper;
     private final LinkBrowserStatsMapper linkBrowserStatsMapper;
+    private final LinkAccessLogsMapper linkAccessLogsMapper;
+    private final LinkDeviceStatsMapper linkDeviceStatsMapper;
+    private final LinkNetworkStatsMapper linkNetworkStatsMapper;
 
     @Value("${short-link.stats.locale.findIp-key}")
     private String findIpKey;
@@ -286,16 +290,17 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
         Cookie[] cookies = request.getCookies();
         AtomicBoolean uvFlag = new AtomicBoolean();
+        AtomicReference<String> uv = new AtomicReference<>();
 
         try{
             Runnable setRespCookieTask = () -> {
-                String uv = UUID.fastUUID().toString();
-                Cookie uvCookie = new Cookie("uv", uv);
+                uv.set(UUID.fastUUID().toString());
+                Cookie uvCookie = new Cookie("uv", uv.get());
                 uvCookie.setMaxAge(60 * 60 * 24 * 30);
                 uvCookie.setPath(StrUtil.sub(fullShortUrl, fullShortUrl.indexOf("/"), fullShortUrl.length()));
                 response.addCookie(uvCookie);
                 uvFlag.set(Boolean.TRUE);
-                stringRedisTemplate.opsForSet().add("short-link:stats:uv" + fullShortUrl, uv);
+                stringRedisTemplate.opsForSet().add("short-link:stats:uv" + fullShortUrl, uv.get());
             };
 
             if (ArrayUtil.isNotEmpty(cookies)){
@@ -304,6 +309,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .findFirst()
                         .map(Cookie::getValue)
                         .ifPresentOrElse(each -> {
+                            uv.set(each);
                             Long added = stringRedisTemplate.opsForSet().add("short-link:stats:uv" + fullShortUrl, each);
                             uvFlag.set(added != null && added > 0L);
                         }, setRespCookieTask);
@@ -311,7 +317,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 setRespCookieTask.run();
             }
 
-            String uip = LinkUtil.getIp(request);
+            String uip = StatsUtil.getIp(request);
             Long uipAdded = stringRedisTemplate.opsForSet().add("short-link:stats:uip" + fullShortUrl, uip);
             boolean uipFlag = uipAdded != null && uipAdded > 0L;
 
@@ -359,8 +365,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 linkLocaleStatsMapper.shortLinkLocaleStats(localeStatsDO);
             }
 
+            String os = StatsUtil.getOs(request);
+
             LinkOsStatsDO osStatsDO = LinkOsStatsDO.builder()
-                    .os(StatsUtil.getOs(request))
+                    .os(os)
                     .fullShortUrl(fullShortUrl)
                     .cnt(1)
                     .gid(gid)
@@ -368,12 +376,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .build();
             linkOsStatsMapper.shortLinkOsStats(osStatsDO);
 
+            String browser = StatsUtil.getBrowser(request);
+
             LinkBrowserStatsDO browserStatsDO = LinkBrowserStatsDO.builder()
                     .gid(gid)
                     .fullShortUrl(fullShortUrl)
                     .cnt(1)
                     .date(new Date())
-                    .browser(StatsUtil.getBrowser(request))
+                    .browser(browser)
                     .build();
             linkBrowserStatsMapper.shortLinkBrowserStats(browserStatsDO);
 
