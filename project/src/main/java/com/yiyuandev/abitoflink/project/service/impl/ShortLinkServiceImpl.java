@@ -377,6 +377,24 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .build();
             linkBrowserStatsMapper.shortLinkBrowserStats(browserStatsDO);
 
+            LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .cnt(1)
+                    .date(new Date())
+                    .device(StatsUtil.getDevice(request))
+                    .build();
+            linkDeviceStatsMapper.shortlinkDeviceStats(linkDeviceStatsDO);
+
+            LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder()
+                    .user(uv.get())
+                    .ip(uip)
+                    .browser(browser)
+                    .os(os)
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .build();
+            linkAccessLogsMapper.insert(linkAccessLogsDO);
 
         } catch (Throwable ex){
             log.error("short link page view stats error", ex);
