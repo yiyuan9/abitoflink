@@ -30,3 +30,7 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
       id-type: auto
+short-link:
+  stats:
+    locale:
+      findIp-key: your-api-key

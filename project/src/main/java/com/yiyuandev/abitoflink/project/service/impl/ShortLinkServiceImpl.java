@@ -7,6 +7,10 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -16,12 +20,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yiyuandev.abitoflink.project.common.convention.exception.ClientException;
 import com.yiyuandev.abitoflink.project.common.convention.exception.ServiceException;
 import com.yiyuandev.abitoflink.project.common.enums.ValidDateTypeEnum;
-import com.yiyuandev.abitoflink.project.dao.entity.LinkAccessStatsDO;
-import com.yiyuandev.abitoflink.project.dao.entity.ShortLinkDO;
-import com.yiyuandev.abitoflink.project.dao.entity.ShortLinkGotoDO;
-import com.yiyuandev.abitoflink.project.dao.mapper.LinkAccessStatsMapper;
-import com.yiyuandev.abitoflink.project.dao.mapper.ShortLinkGotoMapper;
-import com.yiyuandev.abitoflink.project.dao.mapper.ShortLinkMapper;
+import com.yiyuandev.abitoflink.project.dao.entity.*;
+import com.yiyuandev.abitoflink.project.dao.mapper.*;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkPageReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkUpdateReqDTO;
@@ -31,6 +31,7 @@ import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkPageRespDTO;
 import com.yiyuandev.abitoflink.project.service.ShortLinkService;
 import com.yiyuandev.abitoflink.project.util.HashUtil;
 import com.yiyuandev.abitoflink.project.util.LinkUtil;
+import com.yiyuandev.abitoflink.project.util.StatsUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,6 +44,7 @@ import org.jsoup.nodes.Element;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -55,6 +57,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.yiyuandev.abitoflink.project.common.constant.RedisKeyConstant.*;
+import static com.yiyuandev.abitoflink.project.common.constant.ShortLinkConstant.FINDIP_LOCALE_REMOTE_URL;
 
 @Slf4j
 @Service
@@ -66,6 +69,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final StringRedisTemplate stringRedisTemplate;
     private final RedissonClient redissonClient;
     private final LinkAccessStatsMapper linkAccessStatsMapper;
+    private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+    private final LinkOsStatsMapper linkOsStatsMapper;
+    private final LinkBrowserStatsMapper linkBrowserStatsMapper;
+
+    @Value("${short-link.stats.locale.findIp-key}")
+    private String findIpKey;
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
@@ -326,6 +335,49 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .date(new Date())
                     .build();
             linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
+
+            String formattedUrl = String.format(FINDIP_LOCALE_REMOTE_URL, uip, findIpKey);
+            String localeResult = HttpUtil.get(formattedUrl);
+            JSONObject localeResultObj = JSON.parseObject(localeResult);
+
+            String country = StatsUtil.getCountry(localeResultObj);
+            String state = StatsUtil.getState(localeResultObj);
+            String suburb = StatsUtil.getSuburb(localeResultObj);
+            String city = StatsUtil.getCity(localeResultObj);
+
+            if (!JSONUtil.isNull(localeResultObj)){
+                LinkLocaleStatsDO localeStatsDO = LinkLocaleStatsDO.builder()
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .country(country)
+                        .state(state)
+                        .suburb(suburb)
+                        .city(city)
+                        .cnt(1)
+                        .build();
+                linkLocaleStatsMapper.shortLinkLocaleStats(localeStatsDO);
+            }
+
+            LinkOsStatsDO osStatsDO = LinkOsStatsDO.builder()
+                    .os(StatsUtil.getOs(request))
+                    .fullShortUrl(fullShortUrl)
+                    .cnt(1)
+                    .gid(gid)
+                    .date(new Date())
+                    .build();
+            linkOsStatsMapper.shortLinkOsStats(osStatsDO);
+
+            LinkBrowserStatsDO browserStatsDO = LinkBrowserStatsDO.builder()
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .cnt(1)
+                    .date(new Date())
+                    .browser(StatsUtil.getBrowser(request))
+                    .build();
+            linkBrowserStatsMapper.shortLinkBrowserStats(browserStatsDO);
+
+
         } catch (Throwable ex){
             log.error("short link page view stats error", ex);
         }
