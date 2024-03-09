@@ -350,6 +350,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             String state = StatsUtil.getState(localeResultObj);
             String suburb = StatsUtil.getSuburb(localeResultObj);
             String city = StatsUtil.getCity(localeResultObj);
+            String os = StatsUtil.getOs(request);
+            String browser = StatsUtil.getBrowser(request);
+            String device = StatsUtil.getDevice(request);
+            String network = StatsUtil.getNetwork(request);
 
             if (!JSONUtil.isNull(localeResultObj)){
                 LinkLocaleStatsDO localeStatsDO = LinkLocaleStatsDO.builder()
@@ -365,8 +369,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 linkLocaleStatsMapper.shortLinkLocaleStats(localeStatsDO);
             }
 
-            String os = StatsUtil.getOs(request);
-
             LinkOsStatsDO osStatsDO = LinkOsStatsDO.builder()
                     .os(os)
                     .fullShortUrl(fullShortUrl)
@@ -375,8 +377,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .date(new Date())
                     .build();
             linkOsStatsMapper.shortLinkOsStats(osStatsDO);
-
-            String browser = StatsUtil.getBrowser(request);
 
             LinkBrowserStatsDO browserStatsDO = LinkBrowserStatsDO.builder()
                     .gid(gid)
@@ -392,7 +392,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .fullShortUrl(fullShortUrl)
                     .cnt(1)
                     .date(new Date())
-                    .device(StatsUtil.getDevice(request))
+                    .device(device)
                     .build();
             linkDeviceStatsMapper.shortLinkDeviceStats(linkDeviceStatsDO);
 
@@ -401,7 +401,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .fullShortUrl(fullShortUrl)
                     .cnt(1)
                     .date(new Date())
-                    .network(StatsUtil.getNetwork(request))
+                    .network(network)
                     .build();
             linkNetworkStatsMapper.shortLinkNetworkStats(linkNetworkStatsDO);
 
@@ -410,6 +410,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .ip(uip)
                     .browser(browser)
                     .os(os)
+                    .network(network)
+                    .device(device)
+                    .locale(StrUtil.join("-", suburb, state, country))
                     .gid(gid)
                     .fullShortUrl(fullShortUrl)
                     .build();
