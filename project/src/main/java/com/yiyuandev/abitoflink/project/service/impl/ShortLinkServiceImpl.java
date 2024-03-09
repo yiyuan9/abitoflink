@@ -342,7 +342,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .build();
             linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
 
-            String formattedUrl = String.format(FINDIP_LOCALE_REMOTE_URL, "87.121.94.16", findIpKey);
+            String formattedUrl = String.format(FINDIP_LOCALE_REMOTE_URL, uip, findIpKey);
             String localeResult = HttpUtil.get(formattedUrl);
             JSONObject localeResultObj = JSON.parseObject(localeResult);
 

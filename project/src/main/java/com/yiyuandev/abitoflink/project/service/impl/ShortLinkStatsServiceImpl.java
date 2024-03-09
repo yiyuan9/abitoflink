@@ -16,6 +16,7 @@ import com.yiyuandev.abitoflink.project.service.ShortLinkStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -238,7 +239,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
         LambdaQueryWrapper<LinkAccessLogsDO> queryWrapper = Wrappers.lambdaQuery(LinkAccessLogsDO.class)
                 .eq(LinkAccessLogsDO::getGid, requestParam.getGid())
                 .eq(LinkAccessLogsDO::getFullShortUrl, requestParam.getFullShortUrl())
-                .between(LinkAccessLogsDO::getCreationTime, requestParam.getStartDate(), requestParam.getEndDate())
+                .between(LinkAccessLogsDO::getCreationTime, requestParam.getStartDate(), LocalDate.parse(requestParam.getEndDate()).plusDays(1).toString())
                 .eq(LinkAccessLogsDO::getDelFlag, 0)
                 .orderByDesc(LinkAccessLogsDO::getCreationTime);
 
