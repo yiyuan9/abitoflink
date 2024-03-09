@@ -1,5 +1,6 @@
 package com.yiyuandev.abitoflink.project.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -16,8 +17,7 @@ public class StatsUtil {
     public static String getCountry(JSONObject jsonObject){
         return Optional.ofNullable(jsonObject)
                 .map(obj -> obj.getJSONObject("country"))
-                .map(obj -> obj.getJSONObject("names"))
-                .map(str -> str.getString("en"))
+                .map(str -> str.getString("iso_code"))
                 .orElse("unknown");
     }
 
@@ -28,8 +28,7 @@ public class StatsUtil {
         return Optional.ofNullable(jsonObject)
                 .map(obj -> obj.getJSONArray("subdivisions"))
                 .map(obj -> obj.getJSONObject(0))
-                .map(obj -> obj.getJSONObject("names"))
-                .map(str -> str.getString("en"))
+                .map(str -> str.getString("iso_code"))
                 .orElse("unknown");
     }
 
@@ -53,6 +52,7 @@ public class StatsUtil {
                 .map(obj -> obj.getJSONObject("city"))
                 .map(obj -> obj.getJSONObject("names"))
                 .map(str -> str.getString("en"))
+                .map(str -> StrUtil.equals(str, getSuburb(jsonObject)) ? "" : str)
                 .orElse("unknown");
     }
 
@@ -99,4 +99,50 @@ public class StatsUtil {
             return "Unknown";
         }
     }
+
+    /**
+     * get device type
+     */
+    public static String getDevice(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        if (userAgent.toLowerCase().contains("mobile")) {
+            return "Mobile";
+        }
+        return "PC";
+    }
+
+    /**
+     * get ip
+     * @param request HttpServletRequest
+     * @return ip
+     */
+    public static String getIp(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+
+        return ipAddress;
+    }
+
+    /**
+     * get network type
+     */
+    public static String getNetwork(HttpServletRequest request) {
+        String ip = getIp(request);
+        return ip.startsWith("192.168.") || ip.startsWith("10.") ? "WIFI" : "Mobile Data";
+        }
 }
