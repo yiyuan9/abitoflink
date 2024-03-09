@@ -1,5 +1,6 @@
 package com.yiyuandev.abitoflink.project.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -16,8 +17,7 @@ public class StatsUtil {
     public static String getCountry(JSONObject jsonObject){
         return Optional.ofNullable(jsonObject)
                 .map(obj -> obj.getJSONObject("country"))
-                .map(obj -> obj.getJSONObject("names"))
-                .map(str -> str.getString("en"))
+                .map(str -> str.getString("iso_code"))
                 .orElse("unknown");
     }
 
@@ -28,8 +28,7 @@ public class StatsUtil {
         return Optional.ofNullable(jsonObject)
                 .map(obj -> obj.getJSONArray("subdivisions"))
                 .map(obj -> obj.getJSONObject(0))
-                .map(obj -> obj.getJSONObject("names"))
-                .map(str -> str.getString("en"))
+                .map(str -> str.getString("iso_code"))
                 .orElse("unknown");
     }
 
@@ -53,6 +52,7 @@ public class StatsUtil {
                 .map(obj -> obj.getJSONObject("city"))
                 .map(obj -> obj.getJSONObject("names"))
                 .map(str -> str.getString("en"))
+                .map(str -> StrUtil.equals(str, getSuburb(jsonObject)) ? "" : str)
                 .orElse("unknown");
     }
 
