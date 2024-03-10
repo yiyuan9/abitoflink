@@ -80,4 +80,21 @@ public class ShortLinkDO extends BaseDO {
      * favicon
      */
     private String favicon;
+
+    /**
+     * total page view
+     */
+    private Integer totalPv;
+
+    /**
+     * total unique visitors
+     */
+    private Integer totalUv;
+
+    /**
+     * total unique ip
+     */
+    private Integer totalUip;
+
+
 }
