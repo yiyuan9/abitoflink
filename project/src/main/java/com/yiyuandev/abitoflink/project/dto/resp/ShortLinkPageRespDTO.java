@@ -95,7 +95,7 @@ public class ShortLinkPageRespDTO {
     private Integer totalUip;
 
     /**
-     * today's ip cunt
+     * today's unique ip
      */
-    private Integer todayIpCount;
+    private Integer todayUip;
 }
