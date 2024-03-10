@@ -418,6 +418,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .build();
             linkAccessLogsMapper.insert(linkAccessLogsDO);
 
+            baseMapper.incrementStats(gid, fullShortUrl, 1, uvFlag.get() ? 1 : 0, uipFlag ? 1 : 0);
+
         } catch (Throwable ex) {
             log.error("short link page view stats error", ex);
         }
