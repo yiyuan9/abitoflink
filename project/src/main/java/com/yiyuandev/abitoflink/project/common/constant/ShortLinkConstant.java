@@ -10,5 +10,5 @@ public class ShortLinkConstant {
     /**
      * find ip api url
      */
-    public static final String FINDIP_LOCALE_REMOTE_URL = "your-api-url";
+    public static final String FINDIP_LOCALE_REMOTE_URL = "https://api.findip.net/%s/?token=%s";
 }
