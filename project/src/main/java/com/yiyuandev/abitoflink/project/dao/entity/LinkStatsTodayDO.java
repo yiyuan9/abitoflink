@@ -15,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @TableName("t_link_stats_today")
 public class LinkStatsTodayDO extends BaseDO {
-    
+
     /**
      * id
      */
@@ -48,8 +48,8 @@ public class LinkStatsTodayDO extends BaseDO {
     private Integer todayUv;
 
     /**
-     * today's ip cunt
+     * today's unique ip
      */
-    private Integer todayIpCount;
+    private Integer todayUip;
 
 }

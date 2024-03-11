@@ -2,6 +2,7 @@ package com.yiyuandev.abitoflink.project.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yiyuandev.abitoflink.project.dao.entity.LinkAccessLogsDO;
+import com.yiyuandev.abitoflink.project.dao.entity.LinkAccessStatsDO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkStatsReqDTO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -54,8 +55,6 @@ public interface LinkAccessLogsMapper extends BaseMapper<LinkAccessLogsDO> {
     /**
      * check if user type is new or returning
      */
-
-
     @Select("<script> " +
             "SELECT " +
             "    user, " +
@@ -83,4 +82,22 @@ public interface LinkAccessLogsMapper extends BaseMapper<LinkAccessLogsDO> {
             @Param("endDate") String endDate,
             @Param("userAccessLogsList") List<String> userAccessLogsList
     );
+
+
+    /**
+     * Retrieve basic stats for a single short link within a specified date range
+     */
+    @Select("SELECT " +
+            "    COUNT(user) AS pv, " +
+            "    COUNT(DISTINCT user) AS uv, " +
+            "    COUNT(DISTINCT ip) AS uip " +
+            "FROM " +
+            "    t_link_access_logs " +
+            "WHERE " +
+            "    full_short_url = #{param.fullShortUrl} " +
+            "    AND gid = #{param.gid} " +
+            "    AND creation_time BETWEEN #{param.startDate} and ADDDATE(#{param.endDate}, 1) " +
+            "GROUP BY " +
+            "    full_short_url, gid;")
+    LinkAccessStatsDO findPvUvUidStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 }
