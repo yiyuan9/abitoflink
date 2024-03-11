@@ -3,6 +3,7 @@ package com.yiyuandev.abitoflink.project.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yiyuandev.abitoflink.project.common.convention.result.Result;
 import com.yiyuandev.abitoflink.project.common.convention.result.Results;
+import com.yiyuandev.abitoflink.project.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkStatsReqDTO;
@@ -41,5 +42,13 @@ public class ShortLinkStatsController {
     @GetMapping("/api/abitoflink/v1/stats/access-record")
     public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
         return Results.success(shortLinkStatsService.shortLinkStatsAccessRecord(requestParam));
+    }
+
+    /**
+     * access data for short links in the same group in a specific time range (pagination)
+     */
+    @GetMapping("/api/abitoflink/v1/stats/access-record/group")
+    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        return Results.success(shortLinkStatsService.groupStatsAccessRecord(requestParam));
     }
 }
