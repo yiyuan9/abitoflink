@@ -43,6 +43,9 @@ rules:
             shardingColumn: gid
             # Sharding algorithm, corresponding to rules[0].shardingAlgorithms
             shardingAlgorithmName: link_stats_today_table_hash_mod
+    # Binding tables
+    bindingTables:
+      - t_link, t_link_stats_today
     # Sharding algorithm
     shardingAlgorithms:
       # Data table sharding algorithm
