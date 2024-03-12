@@ -10,10 +10,7 @@ import com.yiyuandev.abitoflink.admin.dto.req.RecycleBinRecoverReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.RecycleBinRemoveReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.*;
-import com.yiyuandev.abitoflink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
-import com.yiyuandev.abitoflink.admin.remote.dto.resp.ShortLinkPageRespDTO;
-import com.yiyuandev.abitoflink.admin.remote.dto.resp.ShortLinkStatsAccessRecordRespDTO;
-import com.yiyuandev.abitoflink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
+import com.yiyuandev.abitoflink.admin.remote.dto.resp.*;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
@@ -33,6 +30,18 @@ public interface ShortLinkRemoteService {
     default Result<ShortLinkCreateRespDTO> createShortLink(ShortLinkCreateReqDTO requestParam) {
         String resultBody = HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/create", JSON.toJSONString(requestParam));
         return JSON.parseObject(resultBody, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * batch create links
+     *
+     * @param requestParam ShortLinkBatchCreateReqDTO
+     * @return ShortLinkBatchCreateRespDTO
+     */
+    default Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam) {
+        String resultBodyStr = HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/create/batch", JSON.toJSONString(requestParam));
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
         });
     }
 

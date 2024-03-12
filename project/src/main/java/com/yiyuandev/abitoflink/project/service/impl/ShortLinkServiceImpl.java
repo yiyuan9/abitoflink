@@ -22,12 +22,11 @@ import com.yiyuandev.abitoflink.project.common.convention.exception.ServiceExcep
 import com.yiyuandev.abitoflink.project.common.enums.ValidDateTypeEnum;
 import com.yiyuandev.abitoflink.project.dao.entity.*;
 import com.yiyuandev.abitoflink.project.dao.mapper.*;
+import com.yiyuandev.abitoflink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkPageReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkUpdateReqDTO;
-import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkCreateRespDTO;
-import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkPageRespDTO;
+import com.yiyuandev.abitoflink.project.dto.resp.*;
 import com.yiyuandev.abitoflink.project.service.ShortLinkService;
 import com.yiyuandev.abitoflink.project.util.HashUtil;
 import com.yiyuandev.abitoflink.project.util.LinkUtil;
@@ -287,6 +286,33 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam) {
+        List<String> originUrls = requestParam.getOriginUrls();
+        List<String> descriptions = requestParam.getDescriptions();
+        List<ShortLinkBaseInfoRespDTO> result = new ArrayList<>();
+        for (int i = 0; i < originUrls.size(); i++) {
+            ShortLinkCreateReqDTO shortLinkCreateReqDTO = BeanUtil.toBean(requestParam, ShortLinkCreateReqDTO.class);
+            shortLinkCreateReqDTO.setOriginUrl(originUrls.get(i));
+            shortLinkCreateReqDTO.setDescription(descriptions.get(i));
+            try {
+                ShortLinkCreateRespDTO shortLink = createShortLink(shortLinkCreateReqDTO);
+                ShortLinkBaseInfoRespDTO linkBaseInfoRespDTO = ShortLinkBaseInfoRespDTO.builder()
+                        .fullShortUrl(shortLink.getFullShortUrl())
+                        .originUrl(shortLink.getOriginUrl())
+                        .description(descriptions.get(i))
+                        .build();
+                result.add(linkBaseInfoRespDTO);
+            } catch (Throwable ex) {
+                log.error("Short link batch create error，original parameters：{}", originUrls.get(i));
+            }
+        }
+        return ShortLinkBatchCreateRespDTO.builder()
+                .total(result.size())
+                .baseLinkInfos(result)
+                .build();
     }
 
     private void shortLinkStats(String fullShortUrl, String gid, HttpServletRequest request, HttpServletResponse response) {
