@@ -37,3 +37,5 @@ short-link:
   stats:
     locale:
       findIp-key: your-api-key
+  domain:
+    default: abitof.link:8001
