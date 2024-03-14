@@ -98,4 +98,9 @@ public class ShortLinkPageRespDTO {
      * today's unique ip
      */
     private Integer todayUip;
+
+    /**
+     * delete time
+     */
+    private Long delTime;
 }
