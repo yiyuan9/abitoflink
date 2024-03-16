@@ -115,13 +115,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             shortLinkGotoMapper.insert(shortLinkGotoDO);
 
         } catch (DuplicateKeyException ex) {
-            LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
-                    .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
-            ShortLinkDO hasShortLinkDO = baseMapper.selectOne(queryWrapper);
-            if (hasShortLinkDO != null) {
-                log.warn("short link: {} found duplicate entries in db", fullShortUrl);
-                throw new ServiceException("Duplicate short links found");
-            }
+            throw new ServiceException(String.format("short link：%s found duplicate", fullShortUrl));
         }
 
         stringRedisTemplate.opsForValue().set(
@@ -496,10 +490,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         String shortUri;
         while (true) {
             if (generateCount > 10) {
-                throw new ServiceException("Link generation is too frequent, please try again later");
+                throw new ServiceException("short link generation is too frequent, please try again later");
             }
             String originUrl = requestParam.getOriginUrl();
-            originUrl += System.currentTimeMillis();
+            originUrl += UUID.randomUUID().toString();
             shortUri = HashUtil.hashToBase62(originUrl);
             if (!shortUriCreateCachePenetrationBloomFilter.contains(createShortLinkDefaultDomain + "/" + shortUri)) {
                 break;
