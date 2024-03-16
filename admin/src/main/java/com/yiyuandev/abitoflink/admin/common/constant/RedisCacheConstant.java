@@ -5,7 +5,7 @@ public class RedisCacheConstant {
     /**
      * user registration - distributed locks key
      */
-    public static final String LOCK_USER_REGISTER_KEY = "abitoflink:lock_user-register:";
+    public static final String LOCK_USER_REGISTER_KEY = "short-link:lock_user-register:";
 
     /**
      * group creation - distributed locks key
