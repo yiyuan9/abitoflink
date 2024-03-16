@@ -45,7 +45,7 @@ public class ShortLinkController {
     }
 
     /**
-     * 批量创建短链接
+     * batch create short links
      */
     @PostMapping("/api/abitoflink/v1/create/batch")
     public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam) {
