@@ -55,4 +55,9 @@ public class ShortLinkStatsRecordDTO {
      * uip flag
      */
     private Boolean uipFlag;
+
+    /**
+     * message queue unique id
+     */
+    private String keys;
 }

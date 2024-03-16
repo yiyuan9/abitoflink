@@ -9,9 +9,11 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.yiyuandev.abitoflink.project.common.convention.exception.ServiceException;
 import com.yiyuandev.abitoflink.project.dao.entity.*;
 import com.yiyuandev.abitoflink.project.dao.mapper.*;
 import com.yiyuandev.abitoflink.project.dto.biz.ShortLinkStatsRecordDTO;
+import com.yiyuandev.abitoflink.project.mq.idempotent.MessageQueueIdempotentHandler;
 import com.yiyuandev.abitoflink.project.mq.producer.DelayShortLinkStatsProducer;
 import com.yiyuandev.abitoflink.project.util.StatsUtil;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +54,8 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
     private final LinkStatsTodayMapper linkStatsTodayMapper;
     private final DelayShortLinkStatsProducer delayShortLinkStatsProducer;
     private final StringRedisTemplate stringRedisTemplate;
+    private final MessageQueueIdempotentHandler messageQueueIdempotentHandler;
+
 
     @Value("${short-link.stats.locale.findIp-key}")
     private String findIpKey;
@@ -60,14 +64,29 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
     public void onMessage(MapRecord<String, String, String> message) {
         String stream = message.getStream();
         RecordId id = message.getId();
-        Map<String, String> producerMap = message.getValue();
-        String fullShortUrl = producerMap.get("fullShortUrl");
-        if (StrUtil.isNotBlank(fullShortUrl)) {
-            String gid = producerMap.get("gid");
-            ShortLinkStatsRecordDTO statsRecord = JSON.parseObject(producerMap.get("statsRecord"), ShortLinkStatsRecordDTO.class);
-            actualSaveShortLinkStats(fullShortUrl, gid, statsRecord);
+
+        if (!messageQueueIdempotentHandler.isMessageProcessed(id.toString())) {
+            // check is message is accomplished
+            if (messageQueueIdempotentHandler.isAccomplish(id.toString())) {
+                return;
+            }
+            throw new ServiceException("the message has not completed and requires the message queue to retry");
         }
-        stringRedisTemplate.opsForStream().delete(Objects.requireNonNull(stream), id.getValue());
+        try {
+            Map<String, String> producerMap = message.getValue();
+            String fullShortUrl = producerMap.get("fullShortUrl");
+            if (StrUtil.isNotBlank(fullShortUrl)) {
+                String gid = producerMap.get("gid");
+                ShortLinkStatsRecordDTO statsRecord = JSON.parseObject(producerMap.get("statsRecord"), ShortLinkStatsRecordDTO.class);
+                actualSaveShortLinkStats(fullShortUrl, gid, statsRecord);
+            }
+            stringRedisTemplate.opsForStream().delete(Objects.requireNonNull(stream), id.getValue());
+        } catch (Throwable ex) {
+            //unknown errors
+            messageQueueIdempotentHandler.delMessageProcessed(id.toString());
+            log.error("short link stats consumption error", ex);
+        }
+        messageQueueIdempotentHandler.setAccomplish(id.toString());
     }
 
     public void actualSaveShortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO statsRecord) {

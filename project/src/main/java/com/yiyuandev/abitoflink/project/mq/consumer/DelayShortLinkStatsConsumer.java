@@ -1,8 +1,11 @@
 package com.yiyuandev.abitoflink.project.mq.consumer;
 
+import com.yiyuandev.abitoflink.project.common.convention.exception.ServiceException;
 import com.yiyuandev.abitoflink.project.dto.biz.ShortLinkStatsRecordDTO;
+import com.yiyuandev.abitoflink.project.mq.idempotent.MessageQueueIdempotentHandler;
 import com.yiyuandev.abitoflink.project.service.ShortLinkService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingDeque;
 import org.redisson.api.RDelayedQueue;
 import org.redisson.api.RedissonClient;
@@ -14,12 +17,15 @@ import java.util.concurrent.locks.LockSupport;
 
 import static com.yiyuandev.abitoflink.project.common.constant.RedisKeyConstant.DELAY_QUEUE_STATS_KEY;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DelayShortLinkStatsConsumer implements InitializingBean {
 
     private final RedissonClient redissonClient;
     private final ShortLinkService shortLinkService;
+    private final MessageQueueIdempotentHandler messageQueueIdempotentHandler;
+
 
     public void onMessage() {
         Executors.newSingleThreadExecutor(
@@ -36,7 +42,20 @@ public class DelayShortLinkStatsConsumer implements InitializingBean {
                         try {
                             ShortLinkStatsRecordDTO statsRecord = delayedQueue.poll();
                             if (statsRecord != null) {
-                                shortLinkService.shortLinkStats(null, null, statsRecord);
+                                if (messageQueueIdempotentHandler.isMessageProcessed(statsRecord.getKeys())) {
+                                    // check if the message has completed
+                                    if (messageQueueIdempotentHandler.isAccomplish(statsRecord.getKeys())) {
+                                        return;
+                                    }
+                                    throw new ServiceException("the message has not completed and requires the message queue to retry");
+                                }
+                                try {
+                                    shortLinkService.shortLinkStats(null, null, statsRecord);
+                                } catch (Throwable ex) {
+                                    messageQueueIdempotentHandler.delMessageProcessed(statsRecord.getKeys());
+                                    log.error("delay short link stats consumption error", ex);
+                                }
+                                messageQueueIdempotentHandler.setAccomplish(statsRecord.getKeys());
                                 continue;
                             }
                             LockSupport.parkUntil(500);
