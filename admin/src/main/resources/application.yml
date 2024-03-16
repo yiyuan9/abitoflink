@@ -2,17 +2,17 @@ server:
   port: 8002
 
 spring:
-#  datasource:
-#    username: root
-#    password: 123456
-#    url: jdbc:mysql://127.0.0.1:3306/abitoflink?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B11
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    hikari:
-#      connection-test-query: select 1
-#      connection-timeout: 20000
-#      idle-timeout: 300000
-#      maximum-pool-size: 5
-#      minimum-idle: 5
+  #  datasource:
+  #    username: root
+  #    password: 123456
+  #    url: jdbc:mysql://127.0.0.1:3306/abitoflink?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B11
+  #    driver-class-name: com.mysql.cj.jdbc.Driver
+  #    hikari:
+  #      connection-test-query: select 1
+  #      connection-timeout: 20000
+  #      idle-timeout: 300000
+  #      maximum-pool-size: 5
+  #      minimum-idle: 5
   datasource:
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
     url: jdbc:shardingsphere:classpath:shardingsphere-config-${database.env:dev}.yaml
@@ -20,3 +20,6 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
+short-link:
+  group:
+    max-num: 20
