@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.yiyuandev.abitoflink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
+import static com.yiyuandev.abitoflink.admin.common.constant.RedisCacheConstant.USER_LOGIN_KEY;
 import static com.yiyuandev.abitoflink.admin.common.convention.enums.UserErrorEnum.*;
 
 @Service
@@ -108,7 +109,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             throw new ClientException(USER_NULL);
         }
 
-        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries("login_" + requestParam.getUsername());
+        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries(USER_LOGIN_KEY + requestParam.getUsername());
         if (CollUtil.isNotEmpty(hasLoginMap)) {
             String token = hasLoginMap.keySet().stream()
                     .findFirst()
@@ -125,21 +126,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             key: uuid
             value: JSON String of user info
          */
-        stringRedisTemplate.opsForHash().put("login_" + requestParam.getUsername(), uuid, JSON.toJSONString(userDO));
-        stringRedisTemplate.expire("login_" + requestParam.getUsername(), 30L, TimeUnit.DAYS);
+        stringRedisTemplate.opsForHash().put(USER_LOGIN_KEY + requestParam.getUsername(), uuid, JSON.toJSONString(userDO));
+        stringRedisTemplate.expire(USER_LOGIN_KEY + requestParam.getUsername(), 30L, TimeUnit.DAYS);
 
         return new UserLoginRespDTO(uuid);
     }
 
     @Override
     public Boolean isLogin(String token, String username) {
-        return stringRedisTemplate.opsForHash().hasKey("login_" + username, token);
+        return stringRedisTemplate.opsForHash().hasKey(USER_LOGIN_KEY + username, token);
     }
 
     @Override
     public void logout(String token, String username) {
         if (isLogin(token, username)) {
-            stringRedisTemplate.delete("login_" + username);
+            stringRedisTemplate.delete(USER_LOGIN_KEY + username);
             return;
         }
         throw new ClientException(USER_LOGOUT_ERROR);
