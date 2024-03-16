@@ -2,16 +2,11 @@ package com.yiyuandev.abitoflink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.Week;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -29,7 +24,7 @@ import com.yiyuandev.abitoflink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkPageReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.*;
-import com.yiyuandev.abitoflink.project.mq.producer.DelayShortLinkStatsProducer;
+import com.yiyuandev.abitoflink.project.mq.producer.ShortLinkStatsSaveProducer;
 import com.yiyuandev.abitoflink.project.service.LinkStatsTodayService;
 import com.yiyuandev.abitoflink.project.service.ShortLinkService;
 import com.yiyuandev.abitoflink.project.util.HashUtil;
@@ -62,7 +57,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.yiyuandev.abitoflink.project.common.constant.RedisKeyConstant.*;
-import static com.yiyuandev.abitoflink.project.common.constant.ShortLinkConstant.FINDIP_LOCALE_REMOTE_URL;
 
 @Slf4j
 @Service
@@ -82,10 +76,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
     private final LinkStatsTodayMapper linkStatsTodayMapper;
     private final LinkStatsTodayService linkStatsTodayService;
-    private final DelayShortLinkStatsProducer delayShortLinkStatsProducer;
-
-    @Value("${short-link.stats.locale.findIp-key}")
-    private String findIpKey;
+    private final ShortLinkStatsSaveProducer shortLinkStatsSaveProducer;
 
     @Value("${short-link.domain.default}")
     private String createShortLinkDefaultDomain;
@@ -493,126 +484,11 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     }
 
     public void shortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO statsRecord) {
-        fullShortUrl = Optional.ofNullable(fullShortUrl).orElse(statsRecord.getFullShortUrl());
-        RReadWriteLock readWriteLock = redissonClient.getReadWriteLock(String.format(LOCK_GID_UPDATE_KEY, fullShortUrl));
-        RLock rLock = readWriteLock.readLock();
-        if (!rLock.tryLock()) {
-            delayShortLinkStatsProducer.send(statsRecord);
-            return;
-        }
-
-        try {
-            if (StrUtil.isBlank(gid)) {
-                LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
-                        .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
-                ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(queryWrapper);
-                gid = shortLinkGotoDO.getGid();
-            }
-            int hour = DateUtil.hour(new Date(), true);
-            Week week = DateUtil.dayOfWeekEnum(new Date());
-            int weekValue = week.getIso8601Value();
-            LinkAccessStatsDO linkAccessStatsDO = LinkAccessStatsDO.builder()
-                    .pv(1)
-                    .uv(statsRecord.getUvFlag() ? 1 : 0)
-                    .uip(statsRecord.getUipFlag() ? 1 : 0)
-                    .hour(hour)
-                    .weekday(weekValue)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(new Date())
-                    .build();
-            linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
-
-            String remoteAddr = statsRecord.getRemoteAddr();
-            String formattedUrl = String.format(FINDIP_LOCALE_REMOTE_URL, remoteAddr, findIpKey);
-            String localeResult = HttpUtil.get(formattedUrl);
-            JSONObject localeResultObj = JSON.parseObject(localeResult);
-
-            String country = StatsUtil.getCountry(localeResultObj);
-            String state = StatsUtil.getState(localeResultObj);
-            String suburb = StatsUtil.getSuburb(localeResultObj);
-            String city = StatsUtil.getCity(localeResultObj);
-
-
-            if (!JSONUtil.isNull(localeResultObj)) {
-                LinkLocaleStatsDO localeStatsDO = LinkLocaleStatsDO.builder()
-                        .gid(gid)
-                        .fullShortUrl(fullShortUrl)
-                        .date(new Date())
-                        .country(country)
-                        .state(state)
-                        .suburb(suburb)
-                        .city(city)
-                        .cnt(1)
-                        .build();
-                linkLocaleStatsMapper.shortLinkLocaleStats(localeStatsDO);
-            }
-
-            LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
-                    .os(statsRecord.getOs())
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(new Date())
-                    .build();
-            linkOsStatsMapper.shortLinkOsStats(linkOsStatsDO);
-
-            LinkBrowserStatsDO linkBrowserStatsDO = LinkBrowserStatsDO.builder()
-                    .browser(statsRecord.getBrowser())
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(new Date())
-                    .build();
-            linkBrowserStatsMapper.shortLinkBrowserStats(linkBrowserStatsDO);
-
-            LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
-                    .device(statsRecord.getDevice())
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(new Date())
-                    .build();
-            linkDeviceStatsMapper.shortLinkDeviceStats(linkDeviceStatsDO);
-
-            LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
-                    .network(statsRecord.getNetwork())
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(new Date())
-                    .build();
-            linkNetworkStatsMapper.shortLinkNetworkStats(linkNetworkStatsDO);
-
-            LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder()
-                    .user(statsRecord.getUv())
-                    .ip(statsRecord.getRemoteAddr())
-                    .browser(statsRecord.getBrowser())
-                    .os(statsRecord.getOs())
-                    .network(statsRecord.getNetwork())
-                    .device(statsRecord.getDevice())
-                    .locale(StrUtil.join("-", suburb, state, country))
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .build();
-            linkAccessLogsMapper.insert(linkAccessLogsDO);
-
-            baseMapper.incrementStats(gid, fullShortUrl, 1, statsRecord.getUvFlag() ? 1 : 0, statsRecord.getUipFlag() ? 1 : 0);
-            LinkStatsTodayDO linkStatsTodayDO = LinkStatsTodayDO.builder()
-                    .todayPv(1)
-                    .todayUv(statsRecord.getUvFlag() ? 1 : 0)
-                    .todayUip(statsRecord.getUipFlag() ? 1 : 0)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(new Date())
-                    .build();
-            linkStatsTodayMapper.shortLinkTodayStats(linkStatsTodayDO);
-
-        } catch (Throwable ex) {
-            log.error("short link page view stats error", ex);
-        } finally {
-            rLock.unlock();
-        }
+        Map<String, String> producerMap = new HashMap<>();
+        producerMap.put("fullShortUrl", fullShortUrl);
+        producerMap.put("gid", gid);
+        producerMap.put("statsRecord", JSON.toJSONString(statsRecord));
+        shortLinkStatsSaveProducer.send(producerMap);
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam) {
