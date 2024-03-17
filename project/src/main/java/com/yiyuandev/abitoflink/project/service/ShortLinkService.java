@@ -3,9 +3,12 @@ package com.yiyuandev.abitoflink.project.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yiyuandev.abitoflink.project.dao.entity.ShortLinkDO;
+import com.yiyuandev.abitoflink.project.dto.biz.ShortLinkStatsRecordDTO;
+import com.yiyuandev.abitoflink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkPageReqDTO;
 import com.yiyuandev.abitoflink.project.dto.req.ShortLinkUpdateReqDTO;
+import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.yiyuandev.abitoflink.project.dto.resp.ShortLinkPageRespDTO;
@@ -27,6 +30,7 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
 
     /**
      * number of short links in groups
+     *
      * @param requestParam List<String>
      * @return list of gid + count
      */
@@ -39,9 +43,27 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
 
     /**
      * short link restore full short url
+     *
      * @param shortUri short link suffix
-     * @param request HttpServletRequest
+     * @param request  HttpServletRequest
      * @param response HttpServletResponse
      */
     void restoreUrl(String shortUri, HttpServletRequest request, HttpServletResponse response);
+
+    /**
+     * batch create short links
+     *
+     * @param requestParam ShortLinkBatchCreateReqDTO
+     * @return ShortLinkBatchCreateRespDTO
+     */
+    ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam);
+
+    /**
+     * short link stats
+     *
+     * @param fullShortUrl         full short url
+     * @param gid                  group id
+     * @param shortLinkStatsRecord ShortLinkStatsRecordDTO
+     */
+    void shortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO shortLinkStatsRecord);
 }

@@ -24,6 +24,9 @@ spring:
       prefix: /templates/
       suffix: .html
 mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/*.xml
   global-config:
     db-config:
       logic-delete-field: delFlag
@@ -34,3 +37,5 @@ short-link:
   stats:
     locale:
       findIp-key: your-api-key
+  domain:
+    default: abitof.link:8001

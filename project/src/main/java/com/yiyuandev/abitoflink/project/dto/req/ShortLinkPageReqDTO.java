@@ -13,4 +13,9 @@ public class ShortLinkPageReqDTO extends Page<ShortLinkDO> {
      * group id
      */
     private String gid;
+
+    /**
+     * sort order tag
+     */
+    private String orderTag;
 }

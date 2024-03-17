@@ -2,6 +2,7 @@ package com.yiyuandev.abitoflink.admin.service.impl;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -26,10 +27,12 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.yiyuandev.abitoflink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
+import static com.yiyuandev.abitoflink.admin.common.constant.RedisCacheConstant.USER_LOGIN_KEY;
 import static com.yiyuandev.abitoflink.admin.common.convention.enums.UserErrorEnum.*;
 
 @Service
@@ -46,7 +49,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
                 .eq(UserDO::getUsername, username);
         UserDO userDO = baseMapper.selectOne(queryWrapper);
-        if (userDO == null){
+        if (userDO == null) {
             throw new ClientException(USER_NULL);
         }
         UserRespDTO result = new UserRespDTO();
@@ -62,22 +65,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Override
     public void register(UserRegisterReqDTO requestParam) {
-        if(!isUsernameAvailable(requestParam.getUsername())){
+        if (!isUsernameAvailable(requestParam.getUsername())) {
             throw new ClientException(USER_NAME_EXIST);
         }
         RLock lock = redissonClient.getLock(LOCK_USER_REGISTER_KEY + requestParam.getUsername());
         try {
-            if (lock.tryLock()){
+            if (lock.tryLock()) {
                 try {
                     int inserted = baseMapper.insert(BeanUtil.toBean(requestParam, UserDO.class));
-                    if (inserted < -1){
+                    if (inserted < -1) {
                         throw new ClientException(USER_SAVE_ERROR);
                     }
-                } catch (DuplicateKeyException ex){
+                } catch (DuplicateKeyException ex) {
                     throw new ClientException(USER_EXIST);
                 }
                 userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
-                groupService.saveGroup(requestParam.getUsername(),"default");
+                groupService.saveGroup(requestParam.getUsername(), "default");
                 return;
             }
             throw new ClientException(USER_NAME_EXIST);
@@ -102,13 +105,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
         UserDO userDO = baseMapper.selectOne(queryWrapper);
 
-        if (userDO == null){
+        if (userDO == null) {
             throw new ClientException(USER_NULL);
         }
 
-        Boolean hasLogin = stringRedisTemplate.hasKey("login_" + requestParam.getUsername());
-        if (hasLogin != null && hasLogin){
-            throw new ClientException(USER_HAS_LOGIN);
+        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries(USER_LOGIN_KEY + requestParam.getUsername());
+        if (CollUtil.isNotEmpty(hasLoginMap)) {
+            String token = hasLoginMap.keySet().stream()
+                    .findFirst()
+                    .map(Object::toString)
+                    .orElseThrow(() -> new ClientException("login error"));
+            return new UserLoginRespDTO(token);
         }
         String uuid = UUID.randomUUID().toString();
 
@@ -119,21 +126,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             key: uuid
             value: JSON String of user info
          */
-        stringRedisTemplate.opsForHash().put("login_" + requestParam.getUsername(), uuid, JSON.toJSONString(userDO));
-        stringRedisTemplate.expire("login_" + requestParam.getUsername(), 30L, TimeUnit.DAYS);
+        stringRedisTemplate.opsForHash().put(USER_LOGIN_KEY + requestParam.getUsername(), uuid, JSON.toJSONString(userDO));
+        stringRedisTemplate.expire(USER_LOGIN_KEY + requestParam.getUsername(), 30L, TimeUnit.DAYS);
 
         return new UserLoginRespDTO(uuid);
     }
 
     @Override
     public Boolean isLogin(String token, String username) {
-        return stringRedisTemplate.opsForHash().hasKey("login_" + username, token);
+        return stringRedisTemplate.opsForHash().hasKey(USER_LOGIN_KEY + username, token);
     }
 
     @Override
     public void logout(String token, String username) {
-        if (isLogin(token, username)){
-            stringRedisTemplate.delete("login_" + username);
+        if (isLogin(token, username)) {
+            stringRedisTemplate.delete(USER_LOGIN_KEY + username);
             return;
         }
         throw new ClientException(USER_LOGOUT_ERROR);

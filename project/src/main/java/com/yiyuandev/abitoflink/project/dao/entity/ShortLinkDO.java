@@ -1,6 +1,7 @@
 package com.yiyuandev.abitoflink.project.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yiyuandev.abitoflink.project.common.database.BaseDO;
@@ -80,4 +81,44 @@ public class ShortLinkDO extends BaseDO {
      * favicon
      */
     private String favicon;
+
+    /**
+     * total page view
+     */
+    private Integer totalPv;
+
+    /**
+     * total unique visitors
+     */
+    private Integer totalUv;
+
+    /**
+     * total unique ip
+     */
+    private Integer totalUip;
+
+    /**
+     * today page view
+     */
+    @TableField(exist = false)
+    private Integer todayPv;
+
+    /**
+     * today unique visitors
+     */
+    @TableField(exist = false)
+    private Integer todayUv;
+
+    /**
+     * today unique ip
+     */
+    @TableField(exist = false)
+    private Integer todayUip;
+
+    /**
+     * delete time
+     */
+    private Long delTime;
+
+
 }
