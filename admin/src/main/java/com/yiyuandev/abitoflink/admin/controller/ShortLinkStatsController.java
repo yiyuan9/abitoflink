@@ -2,7 +2,7 @@ package com.yiyuandev.abitoflink.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
-import com.yiyuandev.abitoflink.admin.remote.dto.ShortLinkRemoteService;
+import com.yiyuandev.abitoflink.admin.remote.ShortLinkRemoteService;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkGroupStatsReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkStatsAccessRecordReqDTO;

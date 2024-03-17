@@ -1,4 +1,4 @@
-package com.yiyuandev.abitoflink.admin.remote.dto;
+package com.yiyuandev.abitoflink.admin.remote;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
