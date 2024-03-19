@@ -1,37 +1,35 @@
 package com.yiyuandev.abitoflink.admin.remote;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
 import com.yiyuandev.abitoflink.admin.dto.req.RecycleBinRecoverReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.RecycleBinRemoveReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.*;
 import com.yiyuandev.abitoflink.admin.remote.dto.resp.*;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * short link admin service
+ * remote services short-link-project
  */
+@FeignClient("short-link-project")
 public interface ShortLinkRemoteService {
+
     /**
      * create short link
      *
      * @param requestParam ShortLinkCreateReqDTO
      * @return ShortLinkCreateRespDTO
      */
-    default Result<ShortLinkCreateRespDTO> createShortLink(ShortLinkCreateReqDTO requestParam) {
-        String resultBody = HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/create", JSON.toJSONString(requestParam));
-        return JSON.parseObject(resultBody, new TypeReference<>() {
-        });
-    }
+    @PostMapping("/api/abitoflink/v1/create")
+    Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO requestParam);
 
     /**
      * batch create links
@@ -39,29 +37,25 @@ public interface ShortLinkRemoteService {
      * @param requestParam ShortLinkBatchCreateReqDTO
      * @return ShortLinkBatchCreateRespDTO
      */
-    default Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam) {
-        String resultBodyStr = HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/create/batch", JSON.toJSONString(requestParam));
-        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
-        });
-    }
+    @PostMapping("/api/abitoflink/v1/create/batch")
+    Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam);
 
     /**
-     * short link pagination
+     * update short link
+     *
+     * @param requestParam ShortLinkUpdateReqDTO
+     */
+    @PostMapping("/api/abitoflink/v1/update")
+    void updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam);
+
+    /**
+     * short links pagination
      *
      * @param requestParam ShortLinkPageReqDTO
      * @return IPage<ShortLinkPageRespDTO>
      */
-    default Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("gid", requestParam.getGid());
-        requestMap.put("orderTag", requestParam.getOrderTag());
-        requestMap.put("current", requestParam.getCurrent());
-        requestMap.put("size", requestParam.getSize());
-        String resultPage = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/page", requestMap);
-
-        return JSON.parseObject(resultPage, new TypeReference<>() {
-        });
-    }
+    @GetMapping("/api/abitoflink/v1/page")
+    Result<Page<ShortLinkPageRespDTO>> pageShortLink(@SpringQueryMap ShortLinkPageReqDTO requestParam);
 
     /**
      * number of short links in each group
@@ -69,22 +63,8 @@ public interface ShortLinkRemoteService {
      * @param requestParam {gid}
      * @return List<ShortLinkGroupCountQueryRespDTO>
      */
-    default Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(List<String> requestParam) {
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("requestParam", requestParam);
-        String resultPage = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/count", requestMap);
-        return JSON.parseObject(resultPage, new TypeReference<>() {
-        });
-    }
-
-    /**
-     * update short link
-     *
-     * @param requestParam ShortLinkUpdateReqDTO
-     */
-    default void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
-        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/update", JSON.toJSONString(requestParam));
-    }
+    @GetMapping("/api/abitoflink/v1/count")
+    Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam);
 
     /**
      * get title
@@ -92,20 +72,32 @@ public interface ShortLinkRemoteService {
      * @param url url
      * @return title
      */
-    default Result<String> getTitleByUrl(@RequestParam("url") String url) {
-        String result = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/title?url=" + url);
-        return JSON.parseObject(result, new TypeReference<>() {
-        });
-    }
+    @GetMapping("api/abitoflink/v1/title")
+    Result<String> getTitleByUrl(@RequestParam("url") String url);
 
     /**
      * move to recycle bin
      *
      * @param requestParam RecycleBinSaveReqDTO
      */
-    default void saveRecycleBin(RecycleBinSaveReqDTO requestParam) {
-        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/recycle-bin/save", JSON.toJSONString(requestParam));
-    }
+    @PostMapping("/api/abitoflink/v1/recycle-bin/save")
+    void saveRecycleBin(@RequestBody RecycleBinSaveReqDTO requestParam);
+
+    /**
+     * recover short link from recycle bin
+     *
+     * @param requestParam RecycleBinRecoverReqDTO
+     */
+    @PostMapping("/api/abitoflink/v1/recycle-bin/recover")
+    void recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO requestParam);
+
+    /**
+     * remove short link
+     *
+     * @param requestParam RecycleBinRemoveReqDTO
+     */
+    @PostMapping("/api/abitoflink/v1/recycle-bin/remove")
+    void removeRecycleBin(@RequestBody RecycleBinRemoveReqDTO requestParam);
 
     /**
      * recycle bin item pagination
@@ -113,36 +105,8 @@ public interface ShortLinkRemoteService {
      * @param requestParam ShortLinkPageReqDTO
      * @return IPage<ShortLinkPageRespDTO>
      */
-    default Result<IPage<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("gidList", requestParam.getGidList());
-        requestMap.put("current", requestParam.getCurrent());
-        requestMap.put("size", requestParam.getSize());
-        String resultPage = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/recycle-bin/page", requestMap);
-
-        return JSON.parseObject(resultPage, new TypeReference<>() {
-        });
-    }
-
-    /**
-     * recover short link from recycle bin
-     *
-     * @param requestParam RecycleBinRecoverReqDTO
-     */
-    default void recoverRecycleBin(RecycleBinRecoverReqDTO requestParam) {
-        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/recycle-bin/recover", JSON.toJSONString(requestParam));
-
-    }
-
-    /**
-     * remove short link
-     *
-     * @param requestParam RecycleBinRemoveReqDTO
-     */
-    default void removeRecycleBin(RecycleBinRemoveReqDTO requestParam) {
-        HttpUtil.post("http://127.0.0.1:8001/api/abitoflink/v1/recycle-bin/remove", JSON.toJSONString(requestParam));
-
-    }
+    @GetMapping("api/abitoflink/v1/recycle-bin/page")
+    Result<Page<ShortLinkPageRespDTO>> pageRecycleBinShortLink(@SpringQueryMap ShortLinkRecycleBinPageReqDTO requestParam);
 
     /**
      * get single short link stats
@@ -150,11 +114,8 @@ public interface ShortLinkRemoteService {
      * @param requestParam ShortLinkStatsReqDTO
      * @return single short link stats
      */
-    default Result<ShortLinkStatsRespDTO> oneShortLinkStats(ShortLinkStatsReqDTO requestParam) {
-        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/stats", BeanUtil.beanToMap(requestParam));
-        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
-        });
-    }
+    @GetMapping("/api/abitoflink/v1/stats")
+    Result<ShortLinkStatsRespDTO> oneShortLinkStats(@SpringQueryMap ShortLinkStatsReqDTO requestParam);
 
     /**
      * get short links stats within the same group
@@ -162,38 +123,25 @@ public interface ShortLinkRemoteService {
      * @param requestParam ShortLinkGroupStatsReqDTO
      * @return group short links stats
      */
-    default Result<ShortLinkStatsRespDTO> groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
-        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/stats/group", BeanUtil.beanToMap(requestParam));
-        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
-        });
-    }
+    @GetMapping("/api/abitoflink/v1/stats/group")
+    Result<ShortLinkStatsRespDTO> groupShortLinkStats(@SpringQueryMap ShortLinkGroupStatsReqDTO requestParam);
 
-    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("fullShortUrl", requestParam.getFullShortUrl());
-        requestMap.put("gid", requestParam.getGid());
-        requestMap.put("startDate", requestParam.getStartDate());
-        requestMap.put("endDate", requestParam.getEndDate());
-        requestMap.put("current", requestParam.getCurrent());
-        requestMap.put("size", requestParam.getSize());
-        String resultPage = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/stats/access-record", requestMap);
+    /**
+     * get access record by short link
+     *
+     * @param requestParam ShortLinkStatsAccessRecordReqDTO
+     * @return Page<ShortLinkStatsAccessRecordRespDTO>
+     */
+    @GetMapping("/api/abitoflink/v1/stats/access-record")
+    Result<Page<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(@SpringQueryMap ShortLinkStatsAccessRecordReqDTO requestParam);
 
-        return JSON.parseObject(resultPage, new TypeReference<>() {
-        });
-    }
-
-    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("gid", requestParam.getGid());
-        requestMap.put("startDate", requestParam.getStartDate());
-        requestMap.put("endDate", requestParam.getEndDate());
-        requestMap.put("current", requestParam.getCurrent());
-        requestMap.put("size", requestParam.getSize());
-        String resultPage = HttpUtil.get("http://127.0.0.1:8001/api/abitoflink/v1/stats/access-record/group", requestMap);
-
-        return JSON.parseObject(resultPage, new TypeReference<>() {
-        });
-    }
-
+    /**
+     * get access record by group
+     *
+     * @param requestParam ShortLinkGroupStatsAccessRecordReqDTO
+     * @return Page<ShortLinkStatsAccessRecordRespDTO>
+     */
+    @GetMapping("/api/abitoflink/v1/stats/access-record/group")
+    Result<Page<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(@SpringQueryMap ShortLinkGroupStatsAccessRecordReqDTO requestParam);
 
 }
