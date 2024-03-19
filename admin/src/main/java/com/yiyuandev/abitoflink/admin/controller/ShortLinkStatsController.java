@@ -1,8 +1,8 @@
 package com.yiyuandev.abitoflink.admin.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
-import com.yiyuandev.abitoflink.admin.remote.dto.ShortLinkRemoteService;
+import com.yiyuandev.abitoflink.admin.remote.ShortLinkRemoteService;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkGroupStatsReqDTO;
 import com.yiyuandev.abitoflink.admin.remote.dto.req.ShortLinkStatsAccessRecordReqDTO;
@@ -17,11 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ShortLinkStatsController {
 
-    /**
-     * will be replaced by SpringCloud Feign
-     */
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkRemoteService shortLinkRemoteService;
 
     /**
      * get single short link stats
@@ -44,7 +40,7 @@ public class ShortLinkStatsController {
      * access data for short links in a specific time range (pagination)
      */
     @GetMapping("/api/abitoflink/admin/v1/stats/access-record")
-    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+    public Result<Page<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
         return shortLinkRemoteService.shortLinkStatsAccessRecord(requestParam);
     }
 
@@ -52,7 +48,7 @@ public class ShortLinkStatsController {
      * access data for short links in the same group in a specific time range (pagination)
      */
     @GetMapping("/api/abitoflink/admin/v1/stats/access-record/group")
-    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+    public Result<Page<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
         return shortLinkRemoteService.groupShortLinkStatsAccessRecord(requestParam);
     }
 }

@@ -15,7 +15,7 @@ import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupSortReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.req.LinkGroupUpdateReqDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.LinkGroupRespDTO;
 import com.yiyuandev.abitoflink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import com.yiyuandev.abitoflink.admin.remote.dto.ShortLinkRemoteService;
+import com.yiyuandev.abitoflink.admin.remote.ShortLinkRemoteService;
 import com.yiyuandev.abitoflink.admin.service.GroupService;
 import com.yiyuandev.abitoflink.admin.util.RandomGenerator;
 import lombok.RequiredArgsConstructor;
@@ -42,11 +42,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     private final RedissonClient redissonClient;
 
-    /*
-     TODO: this will be replaced by SpringCloud Feign
-     */
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkRemoteService shortLinkRemoteService;
 
     @Override
     public void saveGroup(String groupName) {
