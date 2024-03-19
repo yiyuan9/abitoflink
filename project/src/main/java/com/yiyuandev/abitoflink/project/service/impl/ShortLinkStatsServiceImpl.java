@@ -6,7 +6,6 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yiyuandev.abitoflink.project.dao.entity.*;
 import com.yiyuandev.abitoflink.project.dao.mapper.*;
@@ -426,8 +425,8 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                 .eq(LinkAccessLogsDO::getDelFlag, 0)
                 .orderByDesc(LinkAccessLogsDO::getCreationTime);
 
-        LinkAccessLogsDO hasLinkAccessLogsDO = linkAccessLogsMapper.selectOne(queryWrapper);
-        if (ObjectUtils.isEmpty(hasLinkAccessLogsDO)) {
+        Long searchResult = linkAccessLogsMapper.selectCount(queryWrapper);
+        if (searchResult <= 0) {
             return null;
         }
 
@@ -469,8 +468,8 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                 .eq(LinkAccessLogsDO::getDelFlag, 0)
                 .orderByDesc(LinkAccessLogsDO::getCreationTime);
 
-        LinkAccessLogsDO hasLinkAccessLogsDO = linkAccessLogsMapper.selectOne(queryWrapper);
-        if (ObjectUtils.isEmpty(hasLinkAccessLogsDO)) {
+        Long searchResult = linkAccessLogsMapper.selectCount(queryWrapper);
+        if (searchResult <= 0) {
             return null;
         }
 
