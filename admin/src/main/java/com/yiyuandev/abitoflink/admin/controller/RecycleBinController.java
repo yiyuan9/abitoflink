@@ -1,6 +1,6 @@
 package com.yiyuandev.abitoflink.admin.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Results;
 import com.yiyuandev.abitoflink.admin.dto.req.RecycleBinRecoverReqDTO;
@@ -25,11 +25,7 @@ public class RecycleBinController {
 
     private final RecycleBinService recycleBinService;
 
-    /*
-    this will be replaced by SpringCloud Feign
-     */
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkRemoteService shortLinkRemoteService;
 
     @PostMapping("/api/abitoflink/admin/v1/recycle-bin/save")
     public Result<Void> saveRecycleBin(@RequestBody RecycleBinSaveReqDTO requestParam) {
@@ -41,7 +37,7 @@ public class RecycleBinController {
      * recycle bin item pagination
      */
     @GetMapping("/api/abitoflink/admin/v1/recycle-bin/page")
-    public Result<IPage<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
+    public Result<Page<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
         return recycleBinService.pageRecycleBinShortLink(requestParam);
     }
 

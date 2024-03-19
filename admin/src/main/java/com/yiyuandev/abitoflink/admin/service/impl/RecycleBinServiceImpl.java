@@ -2,8 +2,8 @@ package com.yiyuandev.abitoflink.admin.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yiyuandev.abitoflink.admin.common.biz.user.UserContext;
 import com.yiyuandev.abitoflink.admin.common.convention.exception.ServiceException;
 import com.yiyuandev.abitoflink.admin.common.convention.result.Result;
@@ -24,14 +24,10 @@ public class RecycleBinServiceImpl implements RecycleBinService {
 
     private final GroupMapper groupMapper;
 
-    /**
-     * this will be replaced by SpringCloud Feign
-     */
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkRemoteService shortLinkRemoteService;
 
     @Override
-    public Result<IPage<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
+    public Result<Page<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .eq(GroupDO::getDelFlag, 0);

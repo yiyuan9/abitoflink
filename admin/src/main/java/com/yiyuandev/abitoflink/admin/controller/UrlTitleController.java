@@ -12,11 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UrlTitleController {
 
-    /*
-     this will be replaced by SpringCloud Feign
-     */
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkRemoteService shortLinkRemoteService;
 
     /**
      * get title of the webpage from url

@@ -42,11 +42,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     private final RedissonClient redissonClient;
 
-    /*
-     TODO: this will be replaced by SpringCloud Feign
-     */
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkRemoteService shortLinkRemoteService;
 
     @Override
     public void saveGroup(String groupName) {
