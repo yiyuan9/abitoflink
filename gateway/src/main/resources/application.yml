@@ -22,7 +22,7 @@ spring:
               args:
                 whitePathList:
                   - /api/abitoflink/admin/v1/user/login
-                  - /api/abitoflink/admin/v1/user/has-username
+                  - /api/abitoflink/admin/v1/user/is-username-available
 
         - id: short-link-project
           uri: lb://short-link-project/api/abitoflink/**
