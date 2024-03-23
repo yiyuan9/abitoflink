@@ -21,8 +21,8 @@ public class GroupController {
     /**
      * Add new group
      */
-    @PostMapping("/api/abitoflink/admin/v1/group/")
-    public Result<Void> saveGroup(@RequestBody LinkGroupSaveReqDTO requestParam){
+    @PostMapping("/api/abitoflink/admin/v1/group")
+    public Result<Void> saveGroup(@RequestBody LinkGroupSaveReqDTO requestParam) {
         groupService.saveGroup(requestParam.getName());
         return Results.success();
     }
@@ -30,33 +30,35 @@ public class GroupController {
     /**
      * Get list of groups created by current user
      */
-    @GetMapping("/api/abitoflink/admin/v1/group/")
-    public Result<List<LinkGroupRespDTO>> listGroup(){
+    @GetMapping("/api/abitoflink/admin/v1/group")
+    public Result<List<LinkGroupRespDTO>> listGroup() {
         return Results.success(groupService.listGroup());
     }
 
     /**
      * Update group name
+     *
      * @param requestParam LinkGroupUpdateReqDTO
      */
-    @PutMapping("/api/abitoflink/admin/v1/group/")
-    public Result<Void> updateGroup(@RequestBody LinkGroupUpdateReqDTO requestParam){
+    @PutMapping("/api/abitoflink/admin/v1/group")
+    public Result<Void> updateGroup(@RequestBody LinkGroupUpdateReqDTO requestParam) {
         groupService.updateGroup(requestParam);
         return Results.success();
     }
 
     /**
      * Delete group
+     *
      * @param gid the group's gid to be deleted
      */
-    @DeleteMapping("/api/abitoflink/admin/v1/group/")
-    public Result<Void> deleteGroup(@RequestParam("gid") String gid){
+    @DeleteMapping("/api/abitoflink/admin/v1/group")
+    public Result<Void> deleteGroup(@RequestParam("gid") String gid) {
         groupService.deleteGroup(gid);
         return Results.success();
     }
 
-    @PostMapping("/api/abitoflink/admin/v1/group/sort/")
-    public Result<Void> sortGroup(@RequestBody List<LinkGroupSortReqDTO> requestParam){
+    @PostMapping("/api/abitoflink/admin/v1/group/sort")
+    public Result<Void> sortGroup(@RequestBody List<LinkGroupSortReqDTO> requestParam) {
         groupService.sortGroup(requestParam);
         return Results.success();
     }

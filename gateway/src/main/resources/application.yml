@@ -1,2 +1,32 @@
 server:
   port: 8000
+spring:
+  application:
+    name: short-link-gateway
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        - id: short-link-admin
+          uri: lb://short-link-admin/api/abitoflink/admin/**
+          predicates:
+            - Path=/api/abitoflink/admin/**
+          filters:
+            - name: TokenValidate
+              args:
+                whitePathList:
+                  - /api/abitoflink/admin/v1/user/login
+                  - /api/abitoflink/admin/v1/user/is-username-available
+
+        - id: short-link-project
+          uri: lb://short-link-project/api/abitoflink/**
+          predicates:
+            - Path=/api/abitoflink/**
+          filters:
+            - name: TokenValidate
