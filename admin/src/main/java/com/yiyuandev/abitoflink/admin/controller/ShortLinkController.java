@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * short link admin controller
  */
-@RestController
+@RestController(value = "shortLinkControllerByAdmin")
 @RequiredArgsConstructor
 public class ShortLinkController {
 

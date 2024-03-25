@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Bloom filter configuration
  */
-@Configuration
+@Configuration(value = "rBloomFilterConfigurationByAdmin")
 public class RBloomFilterConfiguration {
 
     @Bean
