@@ -50,13 +50,13 @@ public class ShortLinkPageRespDTO {
     /**
      * valid_date
      */
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss", timezone = "GMT+11")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+11")
     private Date validDate;
 
     /**
      * creation time
      */
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss", timezone = "GMT+11")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+11")
     private Date creationTime;
 
     /**
