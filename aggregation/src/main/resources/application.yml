@@ -1,0 +1,38 @@
+server:
+  port: 8003
+
+spring:
+  application:
+    name: short-link-aggregation
+  datasource:
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: jdbc:shardingsphere:classpath:shardingsphere-config-${database.env:dev}.yaml
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+aggregation:
+  remote-url: http://127.0.0.1:${server.port}
+
+short-link:
+  group:
+    max-num: 20
+  domain:
+    default: abitof.link:8003
+  stats:
+    locale:
+      findIp-key: your-api-key
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/*.xml

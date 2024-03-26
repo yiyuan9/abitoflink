@@ -57,6 +57,6 @@ public class ShortLinkStatsAccessRecordRespDTO {
     /**
      * creation time
      */
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss", timezone = "GMT+11")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+11")
     private Date creationTime;
 }

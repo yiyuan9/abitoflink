@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * remote services short-link-project
  */
-@FeignClient("short-link-project")
+@FeignClient(value = "short-link-project", url = "${aggregation.remote-url:}")
 public interface ShortLinkRemoteService {
 
     /**
