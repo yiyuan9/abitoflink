@@ -1,6 +1,6 @@
 # a bit of link
 
-> **Note**: update config files to your dev env accordingly before running the application
+> **Note**: update config files to your dev env accordingly before running the application, start only aggregation and gateway services if you are running it within aggregation mode.
 
 ##  Intro
 Short links are frequently used in everyday business marketing, such as in various marketing text messages, where short links appear. They help businesses identify user behavior, click rates, and other key information monitoring during marketing activities. 
