@@ -24,3 +24,13 @@ In the system design, the latest **JDK17 + SpringBoot3 + SpringCloud** microserv
 -   **Multi-tenant Scenarios**: Supports multiple tenants sharing the same system infrastructure while ensuring data isolation, security, and performance across tenants.
 -   **Data Security**: Prioritises the security and privacy of user data, implementing measures to prevent unauthorised access and data breaches.
 -   **Scalability & Extensibility**: Features robust scalability and extensibility to adapt to increasing user numbers and business expansion.
+
+## Disclaimer
+
+Please be advised that this App is intended solely for educational and testing purposes. Users are strictly prohibited from deploying or utilising this application for any illegal activities. It is the responsibility of each user to ensure that their use of the "a bit of link" (this application) complies with all applicable local laws and regulations.
+
+The creators of "a bit of link" (this application) make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability with respect to the application or the information, products, services, or related graphics contained within the app for any purpose. Any reliance placed on such information is therefore strictly at the user's own risk.
+
+In no event will the creators of the "a bit of link" (this application) be liable for any loss or damage including, without limitation, indirect or consequential loss or damage, or any loss or damage whatsoever arising from loss of data or profits arising out of, or in connection with, the use of this Demo App.
+
+By using "a bit of link" (this application), you hereby acknowledge and agree to this disclaimer and commit to using the application in a manner that is lawful and in accordance with the terms outlined herein.
